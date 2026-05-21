@@ -120,6 +120,13 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 .light .body-text { font-family: var(--font-serif); font-size: clamp(16px, 1.9vw, 17px); line-height: 1.75; color: #2a2a2a; margin: 28px 0 32px; max-width: 620px; }
 .light .intro-line { font-family: var(--font-serif); font-size: 16px; line-height: 1.7; color: #3a3a3a; margin-bottom: 24px; font-weight: 500; }
 
+/* CTA-кнопка под светлой секцией */
+.section-cta-light { margin-top: 28px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.btn-cta-light { background: var(--text-dark); border: 1px solid var(--text-dark); color: #ffffff; padding: 16px 24px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.25s; line-height: 1.4; letter-spacing: 0.3px; }
+.btn-cta-light:hover, .btn-cta-light:focus-visible { background: var(--accent-red); border-color: var(--accent-red); box-shadow: 0 4px 16px rgba(255,90,90,0.3); outline: none; }
+.btn-cta-light .arrow { font-size: 12px; letter-spacing: 1.5px; opacity: 0.9; }
+.cta-note-light { font-size: 13px; color: #6a7a6a; }
+
 /* ===== Карточки в светлой теме ===== */
 .advantage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
 .adv-card { background: rgba(255,255,255,0.7); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 22px 26px; }
@@ -129,7 +136,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 .adv-card .summary { font-family: var(--font-mono); font-size: 13px; color: #6a7a6a; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-soft); }
 
 /* ===== Чёрный мост ===== */
-.dark-bridge { background: var(--text-dark); color: #f4f3ef; padding: 24px 28px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 15px; line-height: 1.75; }
+.dark-bridge { background: var(--text-dark); color: #f4f3ef; padding: 24px 28px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 15px; line-height: 1.75; margin-bottom: 28px; }
 .dark-bridge .label-green { color: var(--accent-green-soft); font-size: 12px; letter-spacing: 1px; margin-bottom: 12px; display: block; }
 .dark-bridge .dim { color: #b8b8b8; }
 
@@ -173,7 +180,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 .guarantee-col .col-marker { font-family: var(--font-mono); font-size: 12px; color: var(--accent-green-dark); letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
 .guarantee-col .col-text { font-family: var(--font-serif); font-size: 15px; line-height: 1.65; color: #3a3a3a; }
 
-.final-line { font-family: var(--font-mono); font-size: 14px; color: #6a7a6a; line-height: 1.7; padding-top: 12px; border-top: 1px dashed var(--border-soft); }
+.final-line { font-family: var(--font-mono); font-size: 14px; color: #6a7a6a; line-height: 1.7; padding-top: 12px; border-top: 1px dashed var(--border-soft); margin-bottom: 28px; }
 
 /* ===== ФИНАЛ ===== */
 .final h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(36px, 6vw, 52px); line-height: 1.05; letter-spacing: -1.5px; }
@@ -188,6 +195,64 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 .contacts-col a:hover { border-bottom-style: solid; }
 .contacts-col .privacy-link { color: #b8b8b8; }
 .system-footer { margin-top: 32px; padding-top: 20px; border-top: 1px dashed #2a4a2a; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #5a8a6a; letter-spacing: 0.5px; text-shadow: 0 0 6px #000; flex-wrap: wrap; gap: 8px; }
+
+/* ===== ПРОГРЕСС-БАР СВЕРХУ ===== */
+.progress-nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid #1a3a1a;
+  padding: 8px 16px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.progress-nav::-webkit-scrollbar { display: none; }
+.prog-step {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  color: rgba(255,255,255,0.28);
+  transition: color 0.25s;
+  cursor: pointer;
+  text-decoration: none;
+  min-width: 64px;
+  flex-shrink: 0;
+}
+.prog-step .num { font-size: 11px; letter-spacing: 1px; font-weight: 700; line-height: 1; }
+.prog-step .label { font-size: 9px; letter-spacing: 1.2px; line-height: 1; }
+.prog-step .bar { display: block; height: 2px; width: 24px; background: currentColor; opacity: 0.4; margin-top: 2px; transition: all 0.25s; }
+.prog-step:hover, .prog-step:focus-visible { color: rgba(255,255,255,0.85); outline: none; }
+.prog-step.passed { color: rgba(255,255,255,0.55); }
+.prog-step.passed .bar { opacity: 0.65; }
+.prog-step.active { color: var(--accent-green-soft); }
+.prog-step.active .bar { opacity: 1; width: 32px; height: 2px; }
+
+/* На hero даём запас сверху, чтобы прогресс-бар не залезал на терминальный текст */
+.hero { padding-top: 128px; }
+
+/* ===== ВТОРИЧНАЯ ССЫЛКА «уже понятно — на бриф» ===== */
+.cta-skip-row { margin-top: 14px; }
+.cta-skip {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgba(255,255,255,0.42);
+  border-bottom: 1px dashed currentColor;
+  padding-bottom: 1px;
+  transition: color 0.2s;
+  cursor: pointer;
+  display: inline-block;
+  text-shadow: 0 0 8px #000;
+}
+.cta-skip:hover, .cta-skip:focus-visible { color: var(--accent-red-light); outline: none; }
+/* В светлой секции */
+.light .cta-skip { color: #8a9a8a; text-shadow: none; }
+.light .cta-skip:hover, .light .cta-skip:focus-visible { color: var(--accent-red); }
 
 /* ===== АДАПТИВНОСТЬ ===== */
 @media (max-width: 1023px) {
@@ -218,6 +283,13 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
   .step-card:nth-child(1) { order: 2; }
   .step-card.step-anchor { order: 1; }
   .step-card:nth-child(3) { order: 3; }
+  /* Прогресс-бар на мобильном — компактнее, hero запас меньше */
+  .hero { padding-top: 88px; }
+  .progress-nav { padding: 6px 8px; gap: 0; }
+  .prog-step { padding: 5px 8px; min-width: 0; gap: 4px; }
+  .prog-step .label { display: none; }
+  .prog-step .bar { width: 18px; }
+  .prog-step.active .bar { width: 22px; }
 }
 
 /* ===== prefers-reduced-motion ===== */
@@ -231,8 +303,18 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 </head>
 <body>
 
+<!-- ===== ПРОГРЕСС-БАР: 6 разделов лендинга ===== -->
+<nav class="progress-nav" aria-label="Прогресс по разделам">
+  <a href="#hero"      class="prog-step active" data-section="hero"      onclick="event.preventDefault(); navProgress('hero');"><span class="num">01</span><span class="label">HERO</span><span class="bar"></span></a>
+  <a href="#errors"    class="prog-step"        data-section="errors"    onclick="event.preventDefault(); navProgress('errors');"><span class="num">02</span><span class="label">ERRORS</span><span class="bar"></span></a>
+  <a href="#fails"     class="prog-step"        data-section="fails"     onclick="event.preventDefault(); navProgress('fails');"><span class="num">03</span><span class="label">FAILS</span><span class="bar"></span></a>
+  <a href="#who"       class="prog-step"        data-section="who"       onclick="event.preventDefault(); navProgress('who');"><span class="num">04</span><span class="label">WHO</span><span class="bar"></span></a>
+  <a href="#steps"     class="prog-step"        data-section="steps"     onclick="event.preventDefault(); navProgress('steps');"><span class="num">05</span><span class="label">STEPS</span><span class="bar"></span></a>
+  <a href="#cta-final" class="prog-step"        data-section="cta-final" onclick="event.preventDefault(); navProgress('cta-final');"><span class="num">06</span><span class="label">END</span><span class="bar"></span></a>
+</nav>
+
 <!-- ===== БЛОК 1. HERO ===== -->
-<section class="hero dark">
+<section class="hero dark" id="hero">
   <canvas class="rain" id="rain-hero" aria-hidden="true"></canvas>
   <h1 class="sr-only">Vidim — внешний взгляд на ваш бизнес. Бесплатный бриф за 15 минут.</h1>
   <div class="container">
@@ -254,10 +336,10 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
     </div>
     <div class="terminal-prompt" style="margin-bottom: 12px;">&gt; ваш_выбор:</div>
     <div class="pill-row">
-      <button class="pill-button red" onclick="goToBrief()">
+      <button class="pill-button red" onclick="goToSection('errors', 'hero_cta')">
         <span class="label">▶ ПРОЧИТАТЬ КОД</span>
         <span class="title-row">Увидеть, что не так</span>
-        <span class="sub">бриф 15 минут · бесплатно</span>
+        <span class="sub">7 системных ошибок · 1 минута чтения</span>
       </button>
       <button class="pill-button blue" onclick="onBlueClick()">
         <span class="label">▷ ЗАКРЫТЬ</span>
@@ -273,7 +355,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
 </section>
 
 <!-- ===== БЛОК 2. СИСТЕМНЫЕ ОШИБКИ ===== -->
-<section class="errors dark">
+<section class="errors dark" id="errors">
   <canvas class="rain rain-dim" id="rain-errors" aria-hidden="true"></canvas>
   <div class="container">
     <div class="terminal-prompt">
@@ -330,14 +412,17 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
       <span class="dim">Старая операционная модель больше не масштабируется. И никто внутри её не починит — потому что все внутри Матрицы.</span>
     </div>
     <div class="section-cta">
-      <button class="btn-cta" onclick="goToBrief()"><span class="arrow">▶ </span>УЗНАЛ СЕБЯ — ПРОЧИТАТЬ КОД</button>
-      <span class="cta-note">бриф 15 минут · покажет, в какой именно Матрице вы</span>
+      <button class="btn-cta" onclick="goToSection('fails', 'errors_cta')"><span class="arrow">▼ </span>УЗНАЛ СЕБЯ — ЧТО ДАЛЬШЕ</button>
+      <span class="cta-note">→ а вы уже пробовали выйти. почему не сработало</span>
+    </div>
+    <div class="cta-skip-row">
+      <a class="cta-skip" onclick="goToBrief('errors_skip')">→ уже всё ясно — сразу на бриф ↗</a>
     </div>
   </div>
 </section>
 
 <!-- ===== БЛОК 3. НЕИСПРАВНЫЕ РЕШЕНИЯ ===== -->
-<section class="fails dark">
+<section class="fails dark" id="fails">
   <canvas class="rain rain-dim" id="rain-fails" aria-hidden="true"></canvas>
   <div class="container">
     <div class="terminal-prompt">
@@ -384,14 +469,17 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
       <span class="dim">Не презентацию. План.</span>
     </div>
     <div class="section-cta">
-      <button class="btn-cta" onclick="goToBrief()"><span class="arrow">▶ </span>ПОКАЗАТЬ, ЧЕМ VIDIM ИНАЧЕ</button>
-      <span class="cta-note">бриф 15 минут · бесплатно · без презентаций</span>
+      <button class="btn-cta" onclick="goToSection('who', 'fails_cta')"><span class="arrow">▼ </span>ПОКАЗАТЬ, ЧЕМ VIDIM ИНАЧЕ</button>
+      <span class="cta-note">→ кто мы и почему берёмся за это</span>
+    </div>
+    <div class="cta-skip-row">
+      <a class="cta-skip" onclick="goToBrief('fails_skip')">→ уже всё ясно — сразу на бриф ↗</a>
     </div>
   </div>
 </section>
 
 <!-- ===== БЛОК 4. КТО МЫ ===== -->
-<section class="who light">
+<section class="who light" id="who">
   <canvas class="rain" id="rain-who" aria-hidden="true"></canvas>
   <div class="container">
     <div class="terminal-prompt">
@@ -421,6 +509,13 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
       Выход — это не один прыжок. Это три шага. Каждый — самостоятелен. Каждый — застрахован.<br>
       <span class="dim">Вы можете остановиться на любом — и забрать ценность того, что уже сделали.</span>
     </div>
+    <div class="section-cta-light">
+      <button class="btn-cta-light" onclick="goToSection('steps', 'who_cta')"><span class="arrow">▼ </span>ПОКАЗАТЬ МАРШРУТ ВЫХОДА</button>
+      <span class="cta-note-light">→ три шага · от бесплатного брифа до аудита</span>
+    </div>
+    <div class="cta-skip-row">
+      <a class="cta-skip" onclick="goToBrief('who_skip')">→ уже всё ясно — сразу на бриф ↗</a>
+    </div>
   </div>
 </section>
 
@@ -441,7 +536,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
         <div class="price">бесплатно · 15 минут</div>
         <div class="desc">Онлайн-форма для собственника или гендиректора. 22 вопроса. На выходе — персональный отчёт с топ-3 рисками вашего бизнеса.</div>
         <div class="features">→ профиль клиента<br>→ 3 главных риска<br>→ что делать дальше</div>
-        <button class="step-btn" onclick="goToBrief()">▶ ПРОЙТИ БРИФ</button>
+        <button class="step-btn" onclick="goToSection('cta-final', 'step01_card')">▼ ПЕРЕЙТИ К ЗАПУСКУ</button>
       </div>
 
       <div class="step-card step-anchor">
@@ -452,7 +547,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
         <div class="desc">Заходим в ваши системы и команду. Карта операционного хаоса: топ-10 узких мест, приоритизация по влиянию на прибыль, дорожная карта на 3–6 месяцев.</div>
         <div class="features">→ карта хаоса<br>→ топ-10 узких мест<br>→ дорожная карта 3–6 мес.</div>
         <div class="guarantee-mini">✓ гарантия возврата 100%<br>✓ зачёт в стоимость аудита</div>
-        <button class="step-btn" onclick="goToBrief()">▶ ЗАПУСТИТЬ ДИАГНОСТИКУ</button>
+        <button class="step-btn" onclick="goToSection('cta-final', 'step02_card')">▼ ПЕРЕЙТИ К ЗАПУСКУ</button>
       </div>
 
       <div class="step-card">
@@ -462,7 +557,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
         <div class="desc">Глубокое исследование процессов, людей, технологий и данных. Подбор оптимальных решений и готовые ТЗ для подрядчиков, которые вы можете отдать в работу хоть завтра.</div>
         <div class="features">→ карта процессов<br>→ подбор технологий<br>→ готовые ТЗ под ключ</div>
         <div class="credit-mini">− 200 000 ₽ за диагностику <span class="green">зачтено</span></div>
-        <button class="step-btn" onclick="goToBrief()">▶ УЗНАТЬ ПОДРОБНЕЕ</button>
+        <button class="step-btn" onclick="goToSection('cta-final', 'step03_card')">▼ ПЕРЕЙТИ К ЗАПУСКУ</button>
       </div>
     </div>
 
@@ -489,7 +584,15 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
       </div>
     </div>
 
-    <div class="final-line">&gt; следующий_шаг_за_вами: начните с шага 01 — это бесплатно и ни к чему не обязывает.</div>
+    <div class="final-line">&gt; следующий_шаг_за_вами: первый шаг — бесплатный бриф. 15 минут — и вы знаете, в какой Матрице работаете.</div>
+
+    <div class="section-cta-light">
+      <button class="btn-cta-light" onclick="goToSection('cta-final', 'steps_cta')"><span class="arrow">▼ </span>ПРИНЯТЬ РЕШЕНИЕ</button>
+      <span class="cta-note-light">→ два варианта · один отнимет 15 минут</span>
+    </div>
+    <div class="cta-skip-row">
+      <a class="cta-skip" onclick="goToBrief('steps_skip')">→ уже всё ясно — сразу на бриф ↗</a>
+    </div>
   </div>
 </section>
 
@@ -506,7 +609,7 @@ canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; di
     <div class="quote-block">
       Бриф ни к чему не обязывает. Это просто способ увидеть, в какой Матрице работает ваша компания — и стоит ли с этим что-то делать.
     </div>
-    <button class="btn-mega" onclick="goToBrief()">▶ ПРОЧИТАТЬ КОД · бриф 15 минут</button>
+    <button class="btn-mega" onclick="goToBrief('final_mega')">▶ ПРОЧИТАТЬ КОД · бриф 15 минут</button>
 
     <div class="contacts-grid">
       <div class="contacts-col">
@@ -576,19 +679,97 @@ const HERO_VARIANTS = [
   window.__vidimHeroVariant = variant.id;
 })();
 
-/* ===== CTA ===== */
-function goToBrief() {
+/* ===== НАВИГАЦИЯ МЕЖДУ СЕКЦИЯМИ =====
+   Логика: каждая CTA-кнопка ведёт читателя к следующему блоку.
+   1 → 2 → 3 → 4 → 5 → 6 → BRIEF.
+   На бриф уходит только финальная мега-кнопка из блока 6. */
+function goToSection(id, source) {
+  const el = document.getElementById(id);
+  if (!el) { console.warn('[vidim] section not found:', id); return; }
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  trackEvent('section_cta_click', { from: source, to: id });
+  console.log('[vidim] navigate:', source, '→', id);
+}
+
+/* ===== CTA НА БРИФ (из блока 6 или из вторичных skip-ссылок 2-5) ===== */
+function goToBrief(source) {
   // Передаём вариант hero и источник UTM в бриф
   const params = new URLSearchParams({ from: 'landing' });
+  if (source) params.set('src', source);
   if (window.__vidimHeroVariant) params.set('hero', window.__vidimHeroVariant);
   // Сохраняем UTM-метки если были
   const utm = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
   const currentParams = new URLSearchParams(location.search);
   utm.forEach(k => { if (currentParams.get(k)) params.set(k, currentParams.get(k)); });
+  trackEvent('brief_click', { variant: window.__vidimHeroVariant, source: source || 'final' });
+  console.log('[vidim] click: brief', { variant: window.__vidimHeroVariant, source: source || 'final' });
   window.location.href = 'https://brief.vidim.site?' + params.toString();
-  console.log('[vidim] click: brief', { variant: window.__vidimHeroVariant });
 }
+
+/* ===== ПРОГРЕСС-БАР: клик по сегменту + автоподсветка при скролле ===== */
+const PROG_SECTIONS = ['hero','errors','fails','who','steps','cta-final'];
+function navProgress(id) {
+  goToSection(id, 'progress_nav');
+}
+function initProgressNav() {
+  const steps = document.querySelectorAll('.prog-step');
+  const stepByName = {};
+  steps.forEach(s => { stepByName[s.dataset.section] = s; });
+
+  function setActive(name) {
+    const idx = PROG_SECTIONS.indexOf(name);
+    if (idx < 0) return;
+    PROG_SECTIONS.forEach((sec, i) => {
+      const el = stepByName[sec];
+      if (!el) return;
+      el.classList.toggle('active', i === idx);
+      el.classList.toggle('passed', i < idx);
+    });
+  }
+
+  // IntersectionObserver: активной становится секция, чей верх пересёк линию ~30% от верха viewport
+  const observer = new IntersectionObserver((entries) => {
+    // Среди всех видимых выбираем ту, чей top ближе всего к верху, но уже прошёл прогресс-бар
+    let best = null;
+    let bestTop = -Infinity;
+    document.querySelectorAll('section[id]').forEach(sec => {
+      if (!PROG_SECTIONS.includes(sec.id)) return;
+      const rect = sec.getBoundingClientRect();
+      // Берём секцию, чей top уже выше точки активации (~30% экрана), но максимально близко к ней
+      if (rect.top <= window.innerHeight * 0.35 && rect.top > bestTop) {
+        bestTop = rect.top;
+        best = sec.id;
+      }
+    });
+    if (best) setActive(best);
+  }, { threshold: [0, 0.1, 0.25, 0.5], rootMargin: '0px' });
+
+  document.querySelectorAll('section[id]').forEach(sec => {
+    if (PROG_SECTIONS.includes(sec.id)) observer.observe(sec);
+  });
+
+  // Дополнительно — на чистом scroll (надёжнее на медленных устройствах)
+  let scrollT;
+  window.addEventListener('scroll', () => {
+    if (scrollT) return;
+    scrollT = requestAnimationFrame(() => {
+      scrollT = null;
+      let best = 'hero';
+      let bestTop = -Infinity;
+      PROG_SECTIONS.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const top = el.getBoundingClientRect().top;
+        if (top <= window.innerHeight * 0.35 && top > bestTop) { bestTop = top; best = id; }
+      });
+      setActive(best);
+    });
+  }, { passive: true });
+}
+window.addEventListener('load', initProgressNav);
+
 function onBlueClick() {
+  trackEvent('hero_close_click', {});
   console.log('[vidim] click: close');
   if (history.length > 1) history.back();
   else { alert('Принято. Возвращайтесь, когда хаос станет невыносимым.'); }
@@ -598,7 +779,6 @@ function onBlueClick() {
 function adaptLogMarkers() {
   const isMobile = window.matchMedia('(max-width: 768px)').matches;
   document.querySelectorAll('.log-marker').forEach(el => {
-    // Восстанавливаем исходный текст из data-original (если уже было заменено)
     if (!el.dataset.original) el.dataset.original = el.innerHTML;
     el.innerHTML = isMobile
       ? el.dataset.original.replace(/<br\s*\/?>/gi, ' <span style="color:#5a8a6a">·</span> ')
@@ -622,7 +802,7 @@ function makeRain(canvasId, opts) {
   let raf = null;
   let running = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let frameCounter = 0;
-  const PREWARM_FRAMES = 90; // первые 1.5 сек — быстрый старт
+  const PREWARM_FRAMES = 90;
 
   function resize() {
     rect = container.getBoundingClientRect();
@@ -636,7 +816,6 @@ function makeRain(canvasId, opts) {
   function makeColumn(i) {
     return {
       x: i * opts.colWidth + opts.colWidth/2 + (Math.random()*6 - 3),
-      // Pre-warm: первые колонки начинаются не снизу, а на разных высотах — мгновенное заполнение
       y: frameCounter < PREWARM_FRAMES
          ? Math.random() * rect.height * 1.2
          : rect.height + Math.random() * rect.height * 0.6,
@@ -663,7 +842,6 @@ function makeRain(canvasId, opts) {
 
   function draw() {
     frameCounter++;
-    // Pre-warm: первые 90 кадров шагаем каждый кадр, чтобы быстро накопить картинку
     const prewarm = frameCounter < PREWARM_FRAMES;
     ctx.fillStyle = opts.fadeColor;
     ctx.fillRect(0, 0, rect.width, rect.height);
@@ -698,7 +876,6 @@ function makeRain(canvasId, opts) {
     if (running) raf = requestAnimationFrame(draw);
   }
 
-  // intersection observer — пауза для офскрин-секций (производительность)
   const io = new IntersectionObserver((entries) => {
     for (const e of entries) {
       if (e.isIntersecting && running && !raf) raf = requestAnimationFrame(draw);
@@ -713,7 +890,6 @@ function makeRain(canvasId, opts) {
   io.observe(container);
 }
 
-/* hero — яркая основная анимация */
 const heroOpts = {
   fontSize: 12, colWidth: 26, speedMin: 0.22, speedRange: 0.35,
   lenMin: 14, lenRange: 20, wordChance: 0.18,
@@ -722,7 +898,6 @@ const heroOpts = {
   midColor: (f) => 'rgba(110,240,140,' + (0.9 * f) + ')',
   tailColor: (f) => 'rgba(40,180,70,' + (0.7 * f) + ')'
 };
-/* errors / fails — приглушённая */
 const dimOpts = {
   fontSize: 11, colWidth: 33, speedMin: 0.14, speedRange: 0.24,
   lenMin: 10, lenRange: 14, wordChance: 0.15,
@@ -731,7 +906,6 @@ const dimOpts = {
   midColor: (f) => 'rgba(80,180,110,' + (0.6 * f) + ')',
   tailColor: (f) => 'rgba(25,120,50,' + (0.5 * f) + ')'
 };
-/* who — заметная, но дискретная на светлом */
 const whoOpts = {
   fontSize: 11, colWidth: 38, speedMin: 0.10, speedRange: 0.14,
   lenMin: 7, lenRange: 11, wordChance: 0,
