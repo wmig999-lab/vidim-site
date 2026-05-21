@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#000000">
+<title>Vidim — внешний взгляд на ваш бизнес</title>
+<meta name="description" content="Видим — операционный аудит и консалтинг для растущих компаний от 100 человек. Бесплатный бриф за 15 минут покажет, где ваш бизнес теряет деньги и время.">
+<meta property="og:title" content="Vidim — внешний взгляд на ваш бизнес">
+<meta property="og:description" content="Бесплатный бриф · 15 минут · персональный отчёт о вашем операционном хаосе">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vidim.site">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Spectral:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== БАЗА ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg-dark: #000000;
+  --bg-light: #f4f3ef;
+  --text-light: #ffffff;
+  --text-dark: #1a1a1a;
+  --accent-green: #41ff7d;
+  --accent-green-soft: #7acc8a;
+  --accent-green-dark: #2a8a44;
+  --accent-red: #ff5a5a;
+  --accent-red-light: #ff7070;
+  --accent-blue: #5a9aff;
+  --border-dim: #1a3a1a;
+  --border-soft: #d8d4ca;
+  --font-mono: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  --font-serif: 'Spectral', Georgia, 'PT Serif', serif;
+  --radius-md: 8px;
+  --radius-sm: 6px;
+  --radius-lg: 10px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-mono);
+  color: var(--text-light);
+  background: var(--bg-dark);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+a { color: inherit; text-decoration: none; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ===== СЕКЦИЯ — ОБЩЕЕ ===== */
+section { position: relative; padding: 80px 24px; }
+.container { max-width: 1100px; margin: 0 auto; position: relative; z-index: 2; }
+canvas.rain { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+
+/* ===== ТЁМНЫЕ СЕКЦИИ ===== */
+.dark { background: var(--bg-dark); color: var(--text-light); }
+.dark .terminal-prompt { font-family: var(--font-mono); font-size: 13px; color: var(--accent-green-soft); letter-spacing: 0.5px; text-shadow: 0 0 12px #000, 0 0 6px #000; margin-bottom: 24px; line-height: 1.8; }
+.dark .terminal-prompt .red { color: #ff7070; }
+.dark .terminal-prompt .green { color: var(--accent-green-dark); }
+.dark h1 { font-family: var(--font-serif); font-size: clamp(32px, 5.5vw, 44px); font-weight: 600; line-height: 1.1; color: var(--text-light); letter-spacing: -1px; text-shadow: 0 0 16px #000, 0 0 8px #000, 0 0 3px #000; margin-bottom: 8px; }
+.dark h2 { font-family: var(--font-mono); font-size: clamp(24px, 4vw, 32px); font-weight: 500; line-height: 1.25; color: var(--text-light); letter-spacing: -0.5px; text-shadow: 0 0 16px #000, 0 0 8px #000, 0 0 3px #000; margin-bottom: 12px; }
+.dark .subtitle { font-family: var(--font-mono); font-size: clamp(15px, 1.7vw, 16px); line-height: 1.75; color: #f0f0f0; max-width: 580px; text-shadow: 0 0 12px #000, 0 0 6px #000, 0 0 3px #000; margin-bottom: 32px; }
+.dark .quote-block { background: rgba(0,0,0,0.65); border-left: 2px solid var(--text-light); padding: 14px 16px 14px 18px; font-size: 15px; line-height: 1.7; color: var(--text-light); margin-bottom: 32px; max-width: 620px; }
+.dark .quote-block .accent { font-weight: 600; }
+.dark .quote-block .dim { color: #d0d0d0; }
+
+/* ===== HERO ===== */
+.hero .terminal-prompt span.red { color: #ff7070; }
+.hero .pill-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.pill-button { background: rgba(0,0,0,0.78); border: 1px solid var(--text-light); color: var(--text-light); padding: 18px 20px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.25s; text-align: left; line-height: 1.4; min-height: 92px; display: flex; flex-direction: column; }
+.pill-button .label { font-size: 12px; letter-spacing: 1.5px; margin-bottom: 6px; opacity: 0.85; }
+.pill-button .title-row { font-size: 16px; color: var(--text-light); }
+.pill-button .sub { color: #b8b8b8; font-size: 13px; margin-top: 4px; }
+.pill-button.red:hover, .pill-button.red:focus-visible { background: rgba(30,5,8,0.92); border-color: var(--accent-red); box-shadow: 0 0 0 1px var(--accent-red), 0 0 16px rgba(255,90,90,0.35); outline: none; }
+.pill-button.red:hover .label, .pill-button.red:focus-visible .label { color: #ff8080; }
+.pill-button.red:hover .title-row, .pill-button.red:focus-visible .title-row { color: #ffd0d0; }
+.pill-button.blue { background: rgba(0,0,0,0.55); border-color: rgba(255,255,255,0.35); color: #888; }
+.pill-button.blue .label { color: #6a7080; }
+.pill-button.blue .title-row { color: #888; }
+.pill-button.blue .sub { color: #555; }
+.pill-button.blue:hover, .pill-button.blue:focus-visible { background: rgba(5,15,30,0.92); border-color: var(--accent-blue); box-shadow: 0 0 0 1px var(--accent-blue), 0 0 16px rgba(90,154,255,0.35); outline: none; color: var(--text-light); }
+.pill-button.blue:hover .label, .pill-button.blue:focus-visible .label { color: #80b0ff; }
+.pill-button.blue:hover .title-row, .pill-button.blue:focus-visible .title-row { color: #d0e0ff; }
+.pill-button.blue:hover .sub, .pill-button.blue:focus-visible .sub { color: #b8b8b8; }
+.hero .terminal-footer { margin-top: 28px; padding-top: 18px; border-top: 1px dashed #2a4a2a; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--accent-green-soft); letter-spacing: 0.5px; text-shadow: 0 0 8px #000; flex-wrap: wrap; gap: 8px; }
+@keyframes blink { 50% { opacity: 0; } }
+.cursor-blink { display: inline-block; animation: blink 1.2s steps(2) infinite; }
+
+/* ===== ЛОГ-ПАНЕЛЬ ===== */
+.log-panel { background: rgba(0,0,0,0.72); border: 1px solid var(--border-dim); border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 28px; }
+.log-panel-head { font-size: 12px; color: #5a8a6a; letter-spacing: 1px; padding-bottom: 12px; border-bottom: 1px dashed var(--border-dim); margin-bottom: 16px; overflow-wrap: anywhere; }
+.log-panel-foot { font-size: 12px; color: #5a8a6a; letter-spacing: 1px; padding-top: 12px; border-top: 1px dashed var(--border-dim); margin-top: 16px; overflow-wrap: anywhere; }
+.log-entry { display: grid; grid-template-columns: 78px 1fr; gap: 14px; padding: 14px 0; border-bottom: 1px dashed var(--border-dim); }
+.log-entry:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.log-marker { font-size: 12px; color: var(--accent-red); font-weight: 500; line-height: 1.6; white-space: nowrap; }
+.log-content .err-name { color: #ff7070; font-weight: 500; }
+.log-content .err-line { font-size: 15px; color: var(--text-light); line-height: 1.5; margin-bottom: 6px; }
+.log-content .err-desc { font-size: 14px; color: #9aaa9a; line-height: 1.6; }
+.section-title-block { margin-bottom: 28px; }
+.section-title-block h2 { margin-bottom: 10px; }
+.section-title-block .lead { font-size: clamp(15px, 1.7vw, 16px); color: #d0d0d0; text-shadow: 0 0 10px #000, 0 0 5px #000; }
+
+/* ===== CTA-кнопка под секцией ===== */
+.section-cta { margin-top: 28px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+.btn-cta { background: rgba(0,0,0,0.78); border: 1px solid var(--text-light); color: var(--text-light); padding: 16px 24px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.25s; line-height: 1.4; }
+.btn-cta:hover, .btn-cta:focus-visible { background: rgba(30,5,8,0.92); border-color: var(--accent-red); box-shadow: 0 0 0 1px var(--accent-red), 0 0 16px rgba(255,90,90,0.35); color: #ffd0d0; outline: none; }
+.btn-cta .arrow { font-size: 12px; letter-spacing: 1.5px; opacity: 0.85; }
+.cta-note { font-size: 13px; color: #8a9a8a; }
+
+/* ===== СВЕТЛЫЕ СЕКЦИИ ===== */
+.light { background: var(--bg-light); color: var(--text-dark); }
+.light canvas.rain { opacity: 0.5; }
+.light .terminal-prompt { font-family: var(--font-mono); font-size: 13px; color: #6a7a6a; letter-spacing: 0.5px; margin-bottom: 24px; line-height: 1.8; }
+.light .terminal-prompt .green { color: var(--accent-green-dark); font-weight: 700; }
+.light h2 { font-family: var(--font-serif); font-size: clamp(26px, 4.5vw, 36px); font-weight: 500; line-height: 1.25; color: var(--text-dark); letter-spacing: -0.5px; margin-bottom: 8px; }
+.light h2 em { font-style: italic; font-weight: 500; }
+.light .slogan-line { font-family: var(--font-mono); font-size: 14px; color: #6a7a6a; letter-spacing: 1px; padding-top: 14px; }
+.light .body-text { font-family: var(--font-serif); font-size: clamp(16px, 1.9vw, 17px); line-height: 1.75; color: #2a2a2a; margin: 28px 0 32px; max-width: 620px; }
+.light .intro-line { font-family: var(--font-serif); font-size: 16px; line-height: 1.7; color: #3a3a3a; margin-bottom: 24px; font-weight: 500; }
+
+/* ===== Карточки в светлой теме ===== */
+.advantage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 32px; }
+.adv-card { background: rgba(255,255,255,0.7); border: 1px solid var(--border-soft); border-radius: var(--radius-md); padding: 22px 26px; }
+.adv-card .marker { font-family: var(--font-mono); font-size: 12px; color: #8a9a8a; letter-spacing: 1.2px; margin-bottom: 10px; }
+.adv-card h3 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; color: var(--text-dark); margin-bottom: 12px; line-height: 1.3; }
+.adv-card .desc { font-family: var(--font-serif); font-size: 15px; line-height: 1.65; color: #3a3a3a; }
+.adv-card .summary { font-family: var(--font-mono); font-size: 13px; color: #6a7a6a; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--border-soft); }
+
+/* ===== Чёрный мост ===== */
+.dark-bridge { background: var(--text-dark); color: #f4f3ef; padding: 24px 28px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 15px; line-height: 1.75; }
+.dark-bridge .label-green { color: var(--accent-green-soft); font-size: 12px; letter-spacing: 1px; margin-bottom: 12px; display: block; }
+.dark-bridge .dim { color: #b8b8b8; }
+
+/* ===== STEPS ===== */
+.steps-grid { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 16px; margin-bottom: 16px; align-items: stretch; }
+.step-card { background: rgba(255,255,255,0.85); border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 26px; display: flex; flex-direction: column; }
+.step-card .marker { font-family: var(--font-mono); font-size: 12px; color: #8a9a8a; letter-spacing: 1.2px; margin-bottom: 12px; }
+.step-card h3 { font-family: var(--font-serif); font-size: 24px; font-weight: 500; color: var(--text-dark); margin-bottom: 8px; line-height: 1.2; }
+.step-card .price { font-family: var(--font-mono); font-size: 14px; color: var(--accent-green-dark); margin-bottom: 16px; font-weight: 500; }
+.step-card .desc { font-family: var(--font-serif); font-size: 15px; line-height: 1.65; color: #3a3a3a; margin-bottom: 16px; flex-grow: 1; }
+.step-card .features { font-family: var(--font-mono); font-size: 13px; color: #6a7a6a; padding: 12px 0; border-top: 1px dashed var(--border-soft); border-bottom: 1px dashed var(--border-soft); margin-bottom: 14px; line-height: 1.8; }
+.step-card .step-btn { background: #ffffff; border: 1px solid var(--text-dark); color: var(--text-dark); padding: 14px 18px; border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.5px; }
+.step-card .step-btn:hover, .step-card .step-btn:focus-visible { background: var(--text-dark); color: #ffffff; outline: none; }
+
+/* ===== STEP_02 — ЯКОРЬ ===== */
+.step-anchor { background: var(--text-dark); border: 2px solid var(--text-dark); position: relative; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.step-anchor .badge { position: absolute; top: -12px; right: 16px; background: var(--accent-red); color: #ffffff; font-family: var(--font-mono); font-size: 10px; padding: 4px 10px; border-radius: 4px; letter-spacing: 1px; font-weight: 500; }
+.step-anchor .marker { color: var(--accent-green-soft); }
+.step-anchor h3 { color: #ffffff; }
+.step-anchor .price { color: #ffb070; }
+.step-anchor .desc { color: #e8e8e8; }
+.step-anchor .features { color: #b8b8b8; border-color: #3a3a3a; }
+.step-anchor .guarantee-mini { background: rgba(122,204,138,0.12); border: 1px solid var(--accent-green-dark); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-family: var(--font-mono); font-size: 13px; color: var(--accent-green-soft); line-height: 1.6; }
+.step-anchor .step-btn { background: var(--accent-red); border-color: var(--accent-red); color: #ffffff; }
+.step-anchor .step-btn:hover, .step-anchor .step-btn:focus-visible { background: var(--accent-red-light); border-color: var(--accent-red-light); color: #ffffff; outline: none; }
+
+/* Зачёт в STEP_03 */
+.credit-mini { background: rgba(255,255,255,0.6); border: 1px dashed var(--border-soft); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 14px; font-family: var(--font-mono); font-size: 13px; color: #6a7a6a; line-height: 1.6; }
+.credit-mini .green { color: var(--accent-green-dark); }
+
+/* Подсказка с ориентирами */
+.hints-block { font-family: var(--font-mono); font-size: 14px; color: #6a7a6a; line-height: 1.9; background: rgba(255,255,255,0.5); border: 1px dashed var(--border-soft); border-radius: var(--radius-sm); padding: 16px 20px; margin-bottom: 32px; }
+.hints-block .dark-num { color: var(--text-dark); white-space: nowrap; }
+.hints-block .green { color: var(--accent-green-dark); font-weight: 700; }
+
+/* Большой блок гарантий */
+.guarantee-block { background: #ffffff; border: 1px solid var(--border-soft); border-radius: var(--radius-lg); padding: 24px 28px; margin-bottom: 24px; }
+.guarantee-block .marker { font-family: var(--font-mono); font-size: 12px; color: #8a9a8a; letter-spacing: 1.2px; margin-bottom: 10px; }
+.guarantee-block h3 { font-family: var(--font-serif); font-size: 20px; font-weight: 500; color: var(--text-dark); margin-bottom: 18px; line-height: 1.3; }
+.guarantee-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.guarantee-col .col-marker { font-family: var(--font-mono); font-size: 12px; color: var(--accent-green-dark); letter-spacing: 1px; margin-bottom: 8px; font-weight: 700; }
+.guarantee-col .col-text { font-family: var(--font-serif); font-size: 15px; line-height: 1.65; color: #3a3a3a; }
+
+.final-line { font-family: var(--font-mono); font-size: 14px; color: #6a7a6a; line-height: 1.7; padding-top: 12px; border-top: 1px dashed var(--border-soft); }
+
+/* ===== ФИНАЛ ===== */
+.final h1 { font-family: var(--font-serif); font-weight: 600; font-size: clamp(36px, 6vw, 52px); line-height: 1.05; letter-spacing: -1.5px; }
+.final .sub-final { font-family: var(--font-mono); font-size: clamp(18px, 2.4vw, 22px); line-height: 1.55; color: #d0d0d0; margin-bottom: 32px; max-width: 580px; text-shadow: 0 0 12px #000, 0 0 6px #000; }
+.btn-mega { background: var(--accent-red); border: 1px solid var(--accent-red); color: #ffffff; padding: 20px 36px; border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 16px; font-weight: 500; cursor: pointer; transition: all 0.25s; letter-spacing: 1px; box-shadow: 0 0 24px rgba(255,90,90,0.25); display: inline-block; }
+.btn-mega:hover, .btn-mega:focus-visible { background: var(--accent-red-light); border-color: var(--accent-red-light); box-shadow: 0 0 32px rgba(255,90,90,0.45); outline: none; }
+.contacts-grid { margin-top: 40px; padding-top: 28px; border-top: 1px dashed #2a4a2a; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.contacts-col { color: #e0e0e0; font-size: 14px; line-height: 1.9; text-shadow: 0 0 8px #000; }
+.contacts-col .col-head { font-size: 12px; color: var(--accent-green-soft); letter-spacing: 1.2px; margin-bottom: 14px; text-shadow: 0 0 6px #000; }
+.contacts-col .label { color: #7a9a8a; }
+.contacts-col a { color: #ffffff; border-bottom: 1px dashed #4a6a5a; }
+.contacts-col a:hover { border-bottom-style: solid; }
+.contacts-col .privacy-link { color: #b8b8b8; }
+.system-footer { margin-top: 32px; padding-top: 20px; border-top: 1px dashed #2a4a2a; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #5a8a6a; letter-spacing: 0.5px; text-shadow: 0 0 6px #000; flex-wrap: wrap; gap: 8px; }
+
+/* ===== АДАПТИВНОСТЬ ===== */
+@media (max-width: 1023px) {
+  section { padding: 64px 20px; }
+  .steps-grid { grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .step-card { padding: 20px; }
+  .step-card h3 { font-size: 20px; }
+}
+@media (max-width: 768px) {
+  section { padding: 48px 16px; }
+  .hero .pill-row { grid-template-columns: 1fr; }
+  .log-entry { grid-template-columns: 1fr; gap: 8px; padding: 16px 0; }
+  .log-marker { font-size: 12px; }
+  .log-content .err-line { font-size: 15px; }
+  .log-content .err-desc { font-size: 14px; }
+  .advantage-grid { grid-template-columns: 1fr; gap: 14px; }
+  .steps-grid { grid-template-columns: 1fr; gap: 14px; }
+  .step-card { padding: 24px; }
+  .step-card .features { font-size: 13px; }
+  .guarantee-grid { grid-template-columns: 1fr; gap: 18px; }
+  .hints-block { font-size: 13px; line-height: 1.85; }
+  .contacts-grid { grid-template-columns: 1fr; gap: 24px; }
+  .contacts-col { font-size: 14px; }
+  .btn-mega { width: 100%; box-sizing: border-box; padding: 18px 24px; font-size: 15px; }
+  .system-footer { font-size: 11px; }
+  .hero .terminal-footer { font-size: 11px; }
+  /* На мобильных STEP_02 (якорь) — первой */
+  .step-card:nth-child(1) { order: 2; }
+  .step-card.step-anchor { order: 1; }
+  .step-card:nth-child(3) { order: 3; }
+}
+
+/* ===== prefers-reduced-motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  canvas.rain { opacity: 0.15 !important; }
+  .cursor-blink { animation: none; }
+  * { transition-duration: 0.01ms !important; }
+  html { scroll-behavior: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== БЛОК 1. HERO ===== -->
+<section class="hero dark">
+  <canvas class="rain" id="rain-hero" aria-hidden="true"></canvas>
+  <h1 class="sr-only">Vidim — внешний взгляд на ваш бизнес. Бесплатный бриф за 15 минут.</h1>
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; система_запущена...<br>
+      &gt; сканирование_бизнеса...<br>
+      &gt; обнаружено: <span class="red" id="anomalies-num">17 аномалий</span>
+    </div>
+    <h1 id="hero-line1">Вы построили компанию.</h1>
+    <h1 id="hero-line2">Компания построила вас.</h1>
+    <p class="subtitle">
+      <span id="hero-sub1">Рост остановился. Сотрудников — больше. Прибыли — меньше.</span><br>
+      <span id="hero-sub2">Решения принимаются на интуиции. Отчёты собираются неделю.</span><br>
+      <span id="hero-sub3">Вы тушите пожары вместо того, чтобы расти.</span>
+    </p>
+    <div class="quote-block">
+      Это не вы. Это <span class="accent">Матрица операционного хаоса</span>, в которой работают 9 из 10 растущих компаний от 100 человек.<br>
+      <span class="dim">Мы помогаем её увидеть. И переписать.</span>
+    </div>
+    <div class="terminal-prompt" style="margin-bottom: 12px;">&gt; ваш_выбор:</div>
+    <div class="pill-row">
+      <button class="pill-button red" onclick="goToBrief()">
+        <span class="label">▶ ПРОЧИТАТЬ КОД</span>
+        <span class="title-row">Увидеть, что не так</span>
+        <span class="sub">бриф 15 минут · бесплатно</span>
+      </button>
+      <button class="pill-button blue" onclick="onBlueClick()">
+        <span class="label">▷ ЗАКРЫТЬ</span>
+        <span class="title-row">Оставить как есть</span>
+        <span class="sub">закрыть страницу</span>
+      </button>
+    </div>
+    <div class="terminal-footer">
+      <div>Vidim · ООО «АйВиСистемз» · v.1.0</div>
+      <div>&gt; курсор_мигает_<span class="cursor-blink">█</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== БЛОК 2. СИСТЕМНЫЕ ОШИБКИ ===== -->
+<section class="errors dark">
+  <canvas class="rain rain-dim" id="rain-errors" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; запуск_диагностики...<br>
+      &gt; чтение_системных_логов...<br>
+      &gt; статус: <span class="red">7 критических ошибок</span>
+    </div>
+    <div class="section-title-block">
+      <h2>Как выглядит ваша Матрица</h2>
+      <div class="lead">Узнаёте хотя бы три ошибки — вы внутри.</div>
+    </div>
+    <div class="log-panel">
+      <div class="log-panel-head">[system.log] · ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</div>
+
+      <div class="log-entry"><div class="log-marker">[06:14]<br>ERR_001</div><div class="log-content">
+        <div class="err-line"><span class="err-name">FIRE_LOOP:</span> руководители тушат пожары 6 дней в неделю</div>
+        <div class="err-desc">→ топ-менеджмент не успевает думать о развитии. Стратегия откладывается на «понедельник», который не наступает.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[09:42]<br>ERR_002</div><div class="log-content">
+        <div class="err-line"><span class="err-name">REPORT_DELAY:</span> управленческая отчётность опаздывает на 5–10 дней</div>
+        <div class="err-desc">→ к моменту, когда вы видите цифры, проблема уже превратилась в катастрофу. Решения принимаются «по памяти», а не по данным.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[11:27]<br>ERR_003</div><div class="log-content">
+        <div class="err-line"><span class="err-name">COST_UNDEFINED:</span> реальная себестоимость проекта неизвестна</div>
+        <div class="err-desc">→ вы продаёте, не зная маржи. Каждый новый контракт может оказаться убыточным — узнаете об этом через квартал, если повезёт.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[13:08]<br>ERR_004</div><div class="log-content">
+        <div class="err-line"><span class="err-name">ONBOARDING_FAIL:</span> новый сотрудник адаптируется 2–3 месяца</div>
+        <div class="err-desc">→ регламентов либо нет, либо они мёртвые. Каждый новичок изобретает велосипед, опытные сотрудники теряют недели на «расскажи как».</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[15:33]<br>ERR_005</div><div class="log-content">
+        <div class="err-line"><span class="err-name">DATA_NULL:</span> решения принимаются на «мне кажется»</div>
+        <div class="err-desc">→ у каждого руководителя своя картина мира и своя «правда». Совещания превращаются в споры мнений, а не в работу с фактами.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[17:51]<br>ERR_006</div><div class="log-content">
+        <div class="err-line"><span class="err-name">VENDOR_NOISE:</span> подрядчики продают своё, а в системе ничего не меняется</div>
+        <div class="err-desc">→ CRM-щики продают CRM, безопасники — регламенты, ИИ-стартапы — нейросети. Каждый копает свою яму, никто не видит общую.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">[20:19]<br>ERR_007</div><div class="log-content">
+        <div class="err-line"><span class="err-name">SCALE_BROKEN:</span> наняли больше людей — стало медленнее</div>
+        <div class="err-desc">→ классический симптом сломанной операционной модели. Численность растёт, KPI на человека падает, фонд оплаты съедает прибыль.</div>
+      </div></div>
+
+      <div class="log-panel-foot">─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ · [end_of_log]</div>
+    </div>
+    <div class="quote-block">
+      Это не лень и не плохая команда. Это <span class="accent">закономерность роста</span>: бизнес от 100 человек ломает старые правила управления.<br>
+      <span class="dim">Старая операционная модель больше не масштабируется. И никто внутри её не починит — потому что все внутри Матрицы.</span>
+    </div>
+    <div class="section-cta">
+      <button class="btn-cta" onclick="goToBrief()"><span class="arrow">▶ </span>УЗНАЛ СЕБЯ — ПРОЧИТАТЬ КОД</button>
+      <span class="cta-note">бриф 15 минут · покажет, в какой именно Матрице вы</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== БЛОК 3. НЕИСПРАВНЫЕ РЕШЕНИЯ ===== -->
+<section class="fails dark">
+  <canvas class="rain rain-dim" id="rain-fails" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; проверка_внешних_решений...<br>
+      &gt; анализ_предыдущих_попыток...<br>
+      &gt; результат: <span class="red">5 неисправных модулей</span>
+    </div>
+    <div class="section-title-block">
+      <h2>Вы уже пробовали выйти.</h2>
+      <div class="lead">Почему ни один из подходов не сработал.</div>
+    </div>
+    <div class="log-panel">
+      <div class="log-panel-head">[market.log] · ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</div>
+
+      <div class="log-entry"><div class="log-marker">FAIL_001<br>BIG-4</div><div class="log-content">
+        <div class="err-line"><span class="err-name">BIG_CONSULTING:</span> 6 месяцев анализа, 300 слайдов, ценник от 15 млн</div>
+        <div class="err-desc">→ методология выверенная, отчёт красивый. Внедрять — некому. Через полгода отчёт лежит на полке, а проблемы те же. Подходит для IPO, не подходит для операционки.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">FAIL_002<br>ОДИНОЧКИ</div><div class="log-content">
+        <div class="err-line"><span class="err-name">SOLO_EXPERT:</span> один консультант — одна экспертиза</div>
+        <div class="err-desc">→ «спец по продажам», «спец по процессам», «спец по людям». Каждый видит свой кусок и предлагает свои инструменты. Системы не получается — получается лоскутное одеяло.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">FAIL_003<br>ПОДРЯДЧИКИ</div><div class="log-content">
+        <div class="err-line"><span class="err-name">VENDOR_LOCK:</span> CRM-щики продают CRM, ИИ-стартапы продают ИИ</div>
+        <div class="err-desc">→ диагноз ставится под имеющийся в руках инструмент. Когда у тебя молоток, всё вокруг — гвозди. Внедряют технологию, корень проблемы остаётся.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">FAIL_004<br>ВНУТР. COO</div><div class="log-content">
+        <div class="err-line"><span class="err-name">INTERNAL_HIRE:</span> найм директора по развитию / операционного директора</div>
+        <div class="err-desc">→ полгода на поиск. Год на адаптацию. Два года на первые результаты — если повезёт. А вы внутри Матрицы прямо сейчас, не через три года.</div>
+      </div></div>
+
+      <div class="log-entry"><div class="log-marker">FAIL_005<br>ОЖИДАНИЕ</div><div class="log-content">
+        <div class="err-line"><span class="err-name">WAIT_AND_SEE:</span> «само рассосётся» / «потом разберёмся»</div>
+        <div class="err-desc">→ единственная стратегия, которая стопроцентно не работает. Не рассасывается — усиливается. Через год кризис обойдётся в 5–10 раз дороже, чем его решение сегодня.</div>
+      </div></div>
+
+      <div class="log-panel-foot">─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ · [end_of_market_log]</div>
+    </div>
+    <div class="quote-block">
+      Вы здесь — значит, вы готовы к настоящему решению. <span class="accent">Нужен тот, кто</span> разберётся в системе целиком, скажет правду без слайдов и даст работающий план.<br>
+      <span class="dim">Не презентацию. План.</span>
+    </div>
+    <div class="section-cta">
+      <button class="btn-cta" onclick="goToBrief()"><span class="arrow">▶ </span>ПОКАЗАТЬ, ЧЕМ VIDIM ИНАЧЕ</button>
+      <span class="cta-note">бриф 15 минут · бесплатно · без презентаций</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== БЛОК 4. КТО МЫ ===== -->
+<section class="who light">
+  <canvas class="rain" id="rain-who" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; выход_из_матрицы...<br>
+      &gt; статус: <span class="green">соединение_установлено</span>
+    </div>
+    <h2>Мы не пишем стратегии.<br>Мы <em>выводим из Хаоса</em>.</h2>
+    <div class="slogan-line">Видим · внешний взгляд на ваш бизнес</div>
+    <p class="body-text">Мы заходим в вашу компанию как внешний операционный директор на ограниченный срок. Видим то, что вы перестали замечать. Показываем код, по которому работает ваш бизнес — реальный, а не нарисованный в стратегии.</p>
+    <div class="intro-line">У нас два преимущества, которых нет у классического консалтинга:</div>
+    <div class="advantage-grid">
+      <div class="adv-card">
+        <div class="marker">ПРЕИМУЩЕСТВО_01</div>
+        <h3>Мы видим код.</h3>
+        <div class="desc">В диагностике работает связка опытного управленца и ИИ-аналитики данных. Мы достаём из ваших систем (1С, CRM, почта, чаты) то, что человек глазами не увидит за месяц.</div>
+        <div class="summary">→ аномалии · дубли · утечки времени · узкие места</div>
+      </div>
+      <div class="adv-card">
+        <div class="marker">ПРЕИМУЩЕСТВО_02</div>
+        <h3>Мы — практики.</h3>
+        <div class="desc">Мы сами строим компании, внедряем технологии, проходим через те же кризисы роста, о которых вам рассказываем. И, в отличие от консультантов, не боимся брать ответственность за внедрение.</div>
+        <div class="summary">→ не советы со стороны · участие в результате</div>
+      </div>
+    </div>
+    <div class="dark-bridge">
+      <span class="label-green">&gt; следующий_шаг:</span>
+      Выход — это не один прыжок. Это три шага. Каждый — самостоятелен. Каждый — застрахован.<br>
+      <span class="dim">Вы можете остановиться на любом — и забрать ценность того, что уже сделали.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== БЛОК 5. ТРИ ШАГА ===== -->
+<section class="steps light" id="steps">
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; маршрут_выхода...<br>
+      &gt; этапов_всего: <span class="green">3</span> · обязательность: <span class="green">любой_можно_остановить</span>
+    </div>
+    <h2>Решение собрано<br>из <em>трёх шагов</em>.</h2>
+    <p class="body-text">Каждый шаг — самостоятельный продукт. Можно пройти один и остановиться. Можно идти дальше — и платить только за следующее, потому что предыдущее уже зачтено.</p>
+
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="marker">STEP_01 · ВХОД</div>
+        <h3>Бриф</h3>
+        <div class="price">бесплатно · 15 минут</div>
+        <div class="desc">Онлайн-форма для собственника или гендиректора. 22 вопроса. На выходе — персональный отчёт с топ-3 рисками вашего бизнеса.</div>
+        <div class="features">→ профиль клиента<br>→ 3 главных риска<br>→ что делать дальше</div>
+        <button class="step-btn" onclick="goToBrief()">▶ ПРОЙТИ БРИФ</button>
+      </div>
+
+      <div class="step-card step-anchor">
+        <div class="badge">РЕКОМЕНДОВАНО</div>
+        <div class="marker">STEP_02 · СКАНИРОВАНИЕ</div>
+        <h3>Экспресс-диагностика</h3>
+        <div class="price">200 000 ₽ · 5–7 дней</div>
+        <div class="desc">Заходим в ваши системы и команду. Карта операционного хаоса: топ-10 узких мест, приоритизация по влиянию на прибыль, дорожная карта на 3–6 месяцев.</div>
+        <div class="features">→ карта хаоса<br>→ топ-10 узких мест<br>→ дорожная карта 3–6 мес.</div>
+        <div class="guarantee-mini">✓ гарантия возврата 100%<br>✓ зачёт в стоимость аудита</div>
+        <button class="step-btn" onclick="goToBrief()">▶ ЗАПУСТИТЬ ДИАГНОСТИКУ</button>
+      </div>
+
+      <div class="step-card">
+        <div class="marker">STEP_03 · ВЫХОД</div>
+        <h3>Комплексный аудит + ТЗ</h3>
+        <div class="price">от 600 000 ₽ · 4–8 недель</div>
+        <div class="desc">Глубокое исследование процессов, людей, технологий и данных. Подбор оптимальных решений и готовые ТЗ для подрядчиков, которые вы можете отдать в работу хоть завтра.</div>
+        <div class="features">→ карта процессов<br>→ подбор технологий<br>→ готовые ТЗ под ключ</div>
+        <div class="credit-mini">− 200 000 ₽ за диагностику <span class="green">зачтено</span></div>
+        <button class="step-btn" onclick="goToBrief()">▶ УЗНАТЬ ПОДРОБНЕЕ</button>
+      </div>
+    </div>
+
+    <div class="hints-block">
+      &gt; ориентиры_по_аудиту:<br>
+      &nbsp;&nbsp;· одна компания <span class="dark-num">до 200 чел.</span> — <span class="dark-num">от 600 тыс. ₽</span><br>
+      &nbsp;&nbsp;· одна компания <span class="dark-num">200–500 чел.</span> — <span class="dark-num">от 1,2 млн ₽</span><br>
+      &nbsp;&nbsp;· группа компаний / холдинг — <span class="dark-num">по запросу</span><br>
+      &gt; точная_цифра: после бесплатного брифа.
+    </div>
+
+    <div class="guarantee-block">
+      <div class="marker">МЕХАНИКА_ОПЛАТЫ</div>
+      <h3>Вы платите только за то, что увидели ценным.</h3>
+      <div class="guarantee-grid">
+        <div class="guarantee-col">
+          <div class="col-marker">✓ ГАРАНТИЯ_ВОЗВРАТА</div>
+          <div class="col-text">Не увидели ценности в Экспресс-диагностике — возвращаем 200 000 ₽ полностью. Без споров, без «давайте обсудим».</div>
+        </div>
+        <div class="guarantee-col">
+          <div class="col-marker">✓ ЗАЧЁТ_В_АУДИТ</div>
+          <div class="col-text">Идёте на Комплексный аудит — стоимость диагностики вычитается из его цены. По факту диагностика становится бесплатной.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="final-line">&gt; следующий_шаг_за_вами: начните с шага 01 — это бесплатно и ни к чему не обязывает.</div>
+  </div>
+</section>
+
+<!-- ===== БЛОК 6. ФИНАЛ ===== -->
+<section class="final dark" id="cta-final">
+  <canvas class="rain" id="rain-final" aria-hidden="true"></canvas>
+  <div class="container">
+    <div class="terminal-prompt">
+      &gt; финальный_запрос...<br>
+      &gt; ожидание_решения_пользователя.
+    </div>
+    <h1>Два варианта.</h1>
+    <div class="sub-final">Один отнимет 15 минут.<br>Второй — следующие два года вашей жизни.</div>
+    <div class="quote-block">
+      Бриф ни к чему не обязывает. Это просто способ увидеть, в какой Матрице работает ваша компания — и стоит ли с этим что-то делать.
+    </div>
+    <button class="btn-mega" onclick="goToBrief()">▶ ПРОЧИТАТЬ КОД · бриф 15 минут</button>
+
+    <div class="contacts-grid">
+      <div class="contacts-col">
+        <div class="col-head">&gt; КОНТАКТЫ</div>
+        <div><span class="label">телефон:</span> <a href="tel:+78001234567">+7 (800) 123-45-67</a></div>
+        <div><span class="label">e-mail:</span> <a href="mailto:hello@vidim.site">hello@vidim.site</a></div>
+        <div><span class="label">telegram:</span> <a href="https://t.me/vidim_consult">@vidim_consult</a></div>
+        <div><span class="label">офис:</span> г. Уфа · работаем по всей России и СНГ</div>
+      </div>
+      <div class="contacts-col">
+        <div class="col-head">&gt; РЕКВИЗИТЫ</div>
+        <div>ООО «АйВиСистемз»</div>
+        <div><span class="label">ИНН:</span> 0000000000</div>
+        <div><span class="label">NDA:</span> подписываем до начала любых работ</div>
+        <div><a class="privacy-link" href="/privacy">Политика конфиденциальности · 152-ФЗ</a></div>
+      </div>
+    </div>
+
+    <div class="system-footer">
+      <div>Vidim · направление консалтинга ООО «АйВиСистемз» · 2026</div>
+      <div>&gt; system_idle_<span class="cursor-blink">█</span></div>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ===== ВАРИАТИВНОСТЬ HERO ===== */
+const HERO_VARIANTS = [
+  { id: 'control',  l1: 'Вы построили компанию.',           l2: 'Компания построила вас.',
+    s1: 'Рост остановился. Сотрудников — больше. Прибыли — меньше.',
+    s2: 'Решения принимаются на интуиции. Отчёты собираются неделю.',
+    s3: 'Вы тушите пожары вместо того, чтобы расти.' },
+  { id: 'illusion', l1: 'Выручка растёт.',                  l2: 'А смысла — всё меньше.',
+    s1: 'Команда удвоилась — скорость осталась прежней.',
+    s2: 'Каждый отдел знает свою правду. Никто не знает общую.',
+    s3: 'Вы зарабатываете больше — но почему-то устаёте сильнее.' },
+  { id: 'ceiling',  l1: 'Вы упёрлись в потолок.',           l2: 'Просто не видите его.',
+    s1: 'Раньше работало — сейчас нет, и непонятно почему.',
+    s2: 'Каждое новое решение даёт меньший эффект, чем предыдущее.',
+    s3: 'Чтобы расти дальше — нужно перестать делать то, что привело сюда.' },
+  { id: 'hostage',  l1: 'Это уже не ваша компания.',        l2: 'Это её инерция.',
+    s1: 'Процессы живут своей жизнью. Вы — их пленник.',
+    s2: 'Уволить — некого. Доверить — некому. Изменить — невозможно.',
+    s3: 'Утром вы планируете стратегию. В обед — снова тушите пожар.' },
+  { id: 'cost',     l1: 'Вы платите за хаос каждый день.',  l2: 'Просто не видите счёт.',
+    s1: 'Сколько стоит «он сам разберётся»? Сколько — «потом доделаем»?',
+    s2: 'Сколько денег утекает между отделами, которые не разговаривают?',
+    s3: 'Реальная цена операционного хаоса в компании 100+ человек — десятки миллионов в год.' }
+];
+(function() {
+  const params = new URLSearchParams(location.search);
+  const requested = params.get('hero');
+  let variant = null;
+  if (requested) {
+    const n = parseInt(requested, 10);
+    if (!isNaN(n) && n >= 1 && n <= HERO_VARIANTS.length) variant = HERO_VARIANTS[n-1];
+    else variant = HERO_VARIANTS.find(v => v.id === requested);
+  }
+  if (!variant) variant = HERO_VARIANTS[Math.floor(Math.random() * HERO_VARIANTS.length)];
+  document.getElementById('hero-line1').textContent = variant.l1;
+  document.getElementById('hero-line2').textContent = variant.l2;
+  document.getElementById('hero-sub1').textContent = variant.s1;
+  document.getElementById('hero-sub2').textContent = variant.s2;
+  document.getElementById('hero-sub3').textContent = variant.s3;
+  const anomalies = 11 + Math.floor(Math.random() * 13);
+  document.getElementById('anomalies-num').textContent = anomalies + ' аномалий';
+  window.__vidimHeroVariant = variant.id;
+})();
+
+/* ===== CTA ===== */
+function goToBrief() {
+  // Здесь будет переход на brief.vidim.site. Пока — скролл к финальному CTA.
+  document.getElementById('cta-final').scrollIntoView({ behavior: 'smooth' });
+  console.log('[vidim] click: brief', { variant: window.__vidimHeroVariant });
+}
+function onBlueClick() {
+  console.log('[vidim] click: close');
+  if (history.length > 1) history.back();
+  else { alert('Принято. Возвращайтесь, когда хаос станет невыносимым.'); }
+}
+
+/* ===== АДАПТАЦИЯ МАРКЕРОВ ЛОГА НА МОБИЛЬНОМ ===== */
+function adaptLogMarkers() {
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+  document.querySelectorAll('.log-marker').forEach(el => {
+    // Восстанавливаем исходный текст из data-original (если уже было заменено)
+    if (!el.dataset.original) el.dataset.original = el.innerHTML;
+    el.innerHTML = isMobile
+      ? el.dataset.original.replace(/<br\s*\/?>/gi, ' <span style="color:#5a8a6a">·</span> ')
+      : el.dataset.original;
+  });
+}
+window.addEventListener('load', adaptLogMarkers);
+window.addEventListener('resize', adaptLogMarkers);
+
+/* ===== АНИМАЦИЯ КОДА ===== */
+const GLYPHS = 'АБВГДЕЖЅZИІКЛМНѺПРСТꙋФХѾЦЧШЩЪꙑЬѢЮꙖѦѪѰѮѲѴабвгдежѕзиіклмнѻпрстꙋфхѡцчшщъꙑьѣюꙗѧѫѱѯѳѵ';
+const WORDS = ['истина','хаосъ','время','путь','свѣтъ','тѣнь','слово','мѣра','связь','умъ','воля','духъ','форма','знакъ','родъ','миръ','правда','ладъ','часъ','градъ','родь','законъ','точка','грань'];
+
+function makeRain(canvasId, opts) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const container = canvas.parentElement;
+  let columns = [];
+  let rect = null;
+  let raf = null;
+  let running = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let frameCounter = 0;
+  const PREWARM_FRAMES = 90; // первые 1.5 сек — быстрый старт
+
+  function resize() {
+    rect = container.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(rect.width * dpr);
+    canvas.height = Math.floor(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    initColumns();
+  }
+
+  function makeColumn(i) {
+    return {
+      x: i * opts.colWidth + opts.colWidth/2 + (Math.random()*6 - 3),
+      // Pre-warm: первые колонки начинаются не снизу, а на разных высотах — мгновенное заполнение
+      y: frameCounter < PREWARM_FRAMES
+         ? Math.random() * rect.height * 1.2
+         : rect.height + Math.random() * rect.height * 0.6,
+      speed: opts.speedMin + Math.random() * opts.speedRange,
+      length: opts.lenMin + Math.floor(Math.random() * opts.lenRange),
+      glyphs: [],
+      wordMode: Math.random() < opts.wordChance,
+      word: WORDS[Math.floor(Math.random() * WORDS.length)],
+      wordIndex: 0,
+      stepCounter: 0,
+      stepEvery: opts.stepMin + Math.floor(Math.random() * opts.stepRange)
+    };
+  }
+
+  function initColumns() {
+    const count = Math.floor(rect.width / opts.colWidth);
+    columns = [];
+    for (let i = 0; i < count; i++) {
+      const c = makeColumn(i);
+      for (let j = 0; j < c.length; j++) c.glyphs.push(GLYPHS[Math.floor(Math.random() * GLYPHS.length)]);
+      columns.push(c);
+    }
+  }
+
+  function draw() {
+    frameCounter++;
+    // Pre-warm: первые 90 кадров шагаем каждый кадр, чтобы быстро накопить картинку
+    const prewarm = frameCounter < PREWARM_FRAMES;
+    ctx.fillStyle = opts.fadeColor;
+    ctx.fillRect(0, 0, rect.width, rect.height);
+    ctx.font = opts.fontSize + 'px "PT Serif", "Times New Roman", serif';
+    ctx.textAlign = 'center';
+    for (let i = 0; i < columns.length; i++) {
+      const c = columns[i];
+      c.stepCounter++;
+      const stepThreshold = prewarm ? 1 : c.stepEvery;
+      if (c.stepCounter >= stepThreshold) {
+        c.stepCounter = 0;
+        c.y -= opts.fontSize * c.speed * (prewarm ? 2.5 : 1);
+        if (c.wordMode) { c.glyphs.unshift(c.word[c.wordIndex % c.word.length]); c.wordIndex++; }
+        else c.glyphs.unshift(GLYPHS[Math.floor(Math.random() * GLYPHS.length)]);
+        if (c.glyphs.length > c.length) c.glyphs.pop();
+      }
+      for (let k = 0; k < c.glyphs.length; k++) {
+        const yPos = c.y + k * opts.fontSize;
+        if (yPos < -opts.fontSize || yPos > rect.height + opts.fontSize) continue;
+        const fade = 1 - (k / c.length);
+        if (k === 0) ctx.fillStyle = opts.headColor;
+        else if (k < 3) ctx.fillStyle = opts.midColor(fade);
+        else ctx.fillStyle = opts.tailColor(fade);
+        ctx.fillText(c.glyphs[k], c.x, yPos);
+      }
+      if (c.y + c.length * opts.fontSize < 0) {
+        columns[i] = makeColumn(i);
+        columns[i].y = rect.height + Math.random() * 80;
+        for (let m = 0; m < columns[i].length; m++) columns[i].glyphs.push(GLYPHS[Math.floor(Math.random() * GLYPHS.length)]);
+      }
+    }
+    if (running) raf = requestAnimationFrame(draw);
+  }
+
+  // intersection observer — пауза для офскрин-секций (производительность)
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting && running && !raf) raf = requestAnimationFrame(draw);
+      if (!e.isIntersecting && raf) { cancelAnimationFrame(raf); raf = null; }
+    }
+  }, { threshold: 0 });
+
+  resize();
+  window.addEventListener('resize', resize);
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, rect.width, rect.height);
+  if (running) raf = requestAnimationFrame(draw);
+  io.observe(container);
+}
+
+/* hero — яркая основная анимация */
+const heroOpts = {
+  fontSize: 12, colWidth: 26, speedMin: 0.22, speedRange: 0.35,
+  lenMin: 14, lenRange: 20, wordChance: 0.18,
+  stepMin: 3, stepRange: 3, fadeColor: 'rgba(0,0,0,0.08)',
+  headColor: 'rgba(220,255,225,1.0)',
+  midColor: (f) => 'rgba(110,240,140,' + (0.9 * f) + ')',
+  tailColor: (f) => 'rgba(40,180,70,' + (0.7 * f) + ')'
+};
+/* errors / fails — приглушённая */
+const dimOpts = {
+  fontSize: 11, colWidth: 33, speedMin: 0.14, speedRange: 0.24,
+  lenMin: 10, lenRange: 14, wordChance: 0.15,
+  stepMin: 5, stepRange: 5, fadeColor: 'rgba(0,0,0,0.13)',
+  headColor: 'rgba(180,220,190,0.75)',
+  midColor: (f) => 'rgba(80,180,110,' + (0.6 * f) + ')',
+  tailColor: (f) => 'rgba(25,120,50,' + (0.5 * f) + ')'
+};
+/* who — заметная, но дискретная на светлом */
+const whoOpts = {
+  fontSize: 11, colWidth: 38, speedMin: 0.10, speedRange: 0.14,
+  lenMin: 7, lenRange: 11, wordChance: 0,
+  stepMin: 6, stepRange: 5, fadeColor: 'rgba(244,243,239,0.08)',
+  headColor: 'rgba(60,110,75,0.55)',
+  midColor: (f) => 'rgba(80,130,95,' + (0.4 * f) + ')',
+  tailColor: (f) => 'rgba(100,150,115,' + (0.28 * f) + ')'
+};
+
+window.addEventListener('load', () => {
+  makeRain('rain-hero', heroOpts);
+  makeRain('rain-errors', dimOpts);
+  makeRain('rain-fails', dimOpts);
+  makeRain('rain-who', whoOpts);
+  makeRain('rain-final', heroOpts);
+});
+
+/* ===== АНАЛИТИКА (заглушка под Яндекс.Метрику) ===== */
+function trackEvent(name, data) {
+  if (typeof ym !== 'undefined' && window.YM_ID) {
+    try { ym(window.YM_ID, 'reachGoal', name, data || {}); } catch (e) {}
+  }
+  console.log('[vidim:track]', name, data || {});
+}
+window.addEventListener('load', () => {
+  trackEvent('page_view', { variant: window.__vidimHeroVariant });
+});
+</script>
+
+</body>
+</html>
