@@ -10,9 +10,10 @@
 <meta property="og:description" content="Бесплатный бриф · 15 минут · персональный отчёт о вашем операционном хаосе">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://vidim.site">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Spectral:wght@400;500;600&display=swap" rel="stylesheet">
+
+
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=courier-prime:400,700|spectral:400,500,600&display=swap" rel="stylesheet">
 <style>
 /* ===== БАЗА ===== */
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -577,8 +578,14 @@ const HERO_VARIANTS = [
 
 /* ===== CTA ===== */
 function goToBrief() {
-  // Здесь будет переход на brief.vidim.site. Пока — скролл к финальному CTA.
-  document.getElementById('cta-final').scrollIntoView({ behavior: 'smooth' });
+  // Передаём вариант hero и источник UTM в бриф
+  const params = new URLSearchParams({ from: 'landing' });
+  if (window.__vidimHeroVariant) params.set('hero', window.__vidimHeroVariant);
+  // Сохраняем UTM-метки если были
+  const utm = ['utm_source','utm_medium','utm_campaign','utm_term','utm_content'];
+  const currentParams = new URLSearchParams(location.search);
+  utm.forEach(k => { if (currentParams.get(k)) params.set(k, currentParams.get(k)); });
+  window.location.href = 'https://brief.vidim.site?' + params.toString();
   console.log('[vidim] click: brief', { variant: window.__vidimHeroVariant });
 }
 function onBlueClick() {
