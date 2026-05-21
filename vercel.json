@@ -1,13 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "trailingSlash": false,
 
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "brief.vidim.site" }],
-      "destination": "/brief/:path*"
+      "destination": "/brief/index.html"
     }
   ],
 
@@ -21,7 +19,7 @@
     {
       "source": "/brief/:path*",
       "has": [{ "type": "host", "value": "vidim.site" }],
-      "destination": "https://brief.vidim.site/:path*",
+      "destination": "https://brief.vidim.site/",
       "permanent": true
     },
     {
@@ -33,7 +31,7 @@
     {
       "source": "/brief/:path*",
       "has": [{ "type": "host", "value": "www.vidim.site" }],
-      "destination": "https://brief.vidim.site/:path*",
+      "destination": "https://brief.vidim.site/",
       "permanent": true
     }
   ],
