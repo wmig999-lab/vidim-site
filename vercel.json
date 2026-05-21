@@ -1,15 +1,43 @@
 {
-  "version": 2,
-  "routes": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "cleanUrls": true,
+  "trailingSlash": false,
+
+  "rewrites": [
     {
-      "src": "/brief/(.*)",
-      "dest": "/brief/index.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "brief.vidim.site" }],
+      "destination": "/brief/:path*"
     }
   ],
+
+  "redirects": [
+    {
+      "source": "/brief",
+      "has": [{ "type": "host", "value": "vidim.site" }],
+      "destination": "https://brief.vidim.site/",
+      "permanent": true
+    },
+    {
+      "source": "/brief/:path*",
+      "has": [{ "type": "host", "value": "vidim.site" }],
+      "destination": "https://brief.vidim.site/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/brief",
+      "has": [{ "type": "host", "value": "www.vidim.site" }],
+      "destination": "https://brief.vidim.site/",
+      "permanent": true
+    },
+    {
+      "source": "/brief/:path*",
+      "has": [{ "type": "host", "value": "www.vidim.site" }],
+      "destination": "https://brief.vidim.site/:path*",
+      "permanent": true
+    }
+  ],
+
   "headers": [
     {
       "source": "/(.*)",
@@ -21,7 +49,8 @@
       ]
     },
     {
-      "source": "/brief/(.*)",
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "brief.vidim.site" }],
       "headers": [
         { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
