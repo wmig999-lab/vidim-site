@@ -214,41 +214,41 @@ p { font-size: 16px; line-height: 1.7; color: var(--text-soft); margin-bottom: 1
 
 </style>
 </head>
- <script>
+<script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Каждую секунду проверяем, не появился ли на экране интерфейс ввода Email
+    // Интервал для постоянного контроля динамического интерфейса React
     const checkFormInterval = setInterval(() => {
-      // Ищем текстовое поле ввода почты по его стандартному тегу внутри формы
+      // Ищем поле ввода почты
       const emailInput = document.querySelector('.email-form input[type="email"]');
       
-      // Находим оригинальный блок согласия от React, если он рендерится на экране
-      const originalConsent = document.querySelector('.email-form .consent-wrapper, .email-form [class*="consent"]');
-      if (originalConsent) {
-        // Просто скрываем его из видимости, чтобы не было двоения
+      // Находим встроенную нижнюю галочку-дубликат по её признакам
+      const originalConsent = document.querySelector('.email-form [class*="consent"], .email-form label:last-of-type');
+      if (originalConsent && originalConsent.id !== 'law-consent-label') {
+        // Намертво скрываем её, чтобы не было двоения на экране
         originalConsent.style.display = 'none';
       }
       
-      // Если поле появилось, а нашего юридического чекбокса под ним еще нет
+      // Если поле ввода появилось, а нашего правильного кастомного блока еще нет
       if (emailInput && !document.getElementById('law-consent-checkbox')) {
         const formContainer = emailInput.closest('.email-form');
         if (formContainer) {
           
-          // 1. Создаем блок с текстом согласия и ссылкой на ваш домен
+          // 1. Создаем кастомный аккуратный блок согласия
           const consentWrapper = document.createElement('div');
           consentWrapper.style.cssText = 'display:flex; align-items:flex-start; gap:12px; margin:16px 0; font-family:var(--font-mono); font-size:12px; color:var(--text-soft); line-height:1.55; text-align:left;';
           
           consentWrapper.innerHTML = `
             <input type="checkbox" id="law-consent-checkbox" checked style="margin-top:3px; cursor:pointer; accent-color:var(--accent-green);">
-            <label for="law-consent-checkbox" style="cursor:pointer;">
+            <label id="law-consent-label" for="law-consent-checkbox" style="cursor:pointer;">
               Я даю согласие на обработку персональных данных в соответствии с 
-              <a href="#" onclick="window.open('https://vidim.site/privacy', '_blank'); return false;" style="text-decoration:underline; color:var(--accent-green); font-weight:700;">Политикой конфиденциальности</a>.
+              <a href="#" onclick="window.open('https://vidim.site/privacy.html', '_blank'); return false;" style="text-decoration:underline; color:var(--accent-green); font-weight:700;">Политикой конфиденциальности</a>.
             </label>
           `;
           
-          // 2. Аккуратно встраиваем этот блок сразу после поля ввода Email
+          // 2. Вставляем его сразу под полем ввода почты
           emailInput.parentNode.insertBefore(consentWrapper, emailInput.nextSibling);
           
-          // 3. Связываем галочку с кнопкой "Сохранить и продолжить"
+          // 3. Синхронизируем состояние чекбокса с кнопкой отправки формы
           const mainButton = formContainer.closest('.screen').querySelector('.btn-primary');
           const checkbox = document.getElementById('law-consent-checkbox');
           
@@ -267,7 +267,7 @@ p { font-size: 16px; line-height: 1.7; color: var(--text-soft); margin-bottom: 1
           }
         }
       }
-    }, 1000); // Частота проверки — раз в секунду
+    }, 1000); // Проверка раз в секунду
   });
 </script>
 <body>
