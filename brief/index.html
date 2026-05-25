@@ -214,12 +214,19 @@ p { font-size: 16px; line-height: 1.7; color: var(--text-soft); margin-bottom: 1
 
 </style>
 </head>
-  <script>
+ <script>
   document.addEventListener("DOMContentLoaded", () => {
     // Каждую секунду проверяем, не появился ли на экране интерфейс ввода Email
     const checkFormInterval = setInterval(() => {
       // Ищем текстовое поле ввода почты по его стандартному тегу внутри формы
       const emailInput = document.querySelector('.email-form input[type="email"]');
+      
+      // Находим оригинальный блок согласия от React, если он рендерится на экране
+      const originalConsent = document.querySelector('.email-form .consent-wrapper, .email-form [class*="consent"]');
+      if (originalConsent) {
+        // Просто скрываем его из видимости, чтобы не было двоения
+        originalConsent.style.display = 'none';
+      }
       
       // Если поле появилось, а нашего юридического чекбокса под ним еще нет
       if (emailInput && !document.getElementById('law-consent-checkbox')) {
@@ -234,14 +241,14 @@ p { font-size: 16px; line-height: 1.7; color: var(--text-soft); margin-bottom: 1
             <input type="checkbox" id="law-consent-checkbox" checked style="margin-top:3px; cursor:pointer; accent-color:var(--accent-green);">
             <label for="law-consent-checkbox" style="cursor:pointer;">
               Я даю согласие на обработку персональных данных в соответствии с 
-             <a href="#" onclick="window.open('https://brief.vidim.site/privacy.html', '_blank'); return false;" style="text-decoration:underline; color:var(--accent-green); font-weight:700;">Политикой конфиденциальности</a>.
+              <a href="#" onclick="window.open('https://vidim.site/privacy', '_blank'); return false;" style="text-decoration:underline; color:var(--accent-green); font-weight:700;">Политикой конфиденциальности</a>.
             </label>
           `;
           
           // 2. Аккуратно встраиваем этот блок сразу после поля ввода Email
           emailInput.parentNode.insertBefore(consentWrapper, emailInput.nextSibling);
           
-          // 3. Связываем галочку с кнопкой "Далее" / "Отправить"
+          // 3. Связываем галочку с кнопкой "Сохранить и продолжить"
           const mainButton = formContainer.closest('.screen').querySelector('.btn-primary');
           const checkbox = document.getElementById('law-consent-checkbox');
           
@@ -251,8 +258,10 @@ p { font-size: 16px; line-height: 1.7; color: var(--text-soft); margin-bottom: 1
               if (!checkbox.checked) {
                 mainButton.style.opacity = "0.3";
                 mainButton.style.boxShadow = "none";
+                mainButton.style.cursor = "not-allowed";
               } else {
                 mainButton.style.opacity = "1";
+                mainButton.style.cursor = "pointer";
               }
             });
           }
