@@ -1,15 +1,24 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
   "rewrites": [
+    {
+      "source": "/api/:path*",
+      "has": [{ "type": "host", "value": "brief.vidim.site" }],
+      "destination": "/api/:path*"
+    },
     {
       "source": "/(.*)",
       "has": [{ "type": "host", "value": "brief.vidim.site" }],
       "destination": "/brief/index.html"
     }
   ],
-
   "redirects": [
+    {
+      "source": "/privacy",
+      "has": [{ "type": "host", "value": "brief.vidim.site" }],
+      "destination": "https://vidim.site/privacy",
+      "permanent": false
+    },
     {
       "source": "/brief",
       "has": [{ "type": "host", "value": "vidim.site" }],
@@ -35,7 +44,6 @@
       "permanent": true
     }
   ],
-
   "headers": [
     {
       "source": "/(.*)",
