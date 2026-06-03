@@ -3,7 +3,6 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "has": [{ "type": "host", "value": "brief.vidim.site" }],
       "destination": "/api/:path*"
     },
     {
