@@ -265,6 +265,42 @@ h2 em{font-style:normal;color:var(--muted);}
 .msuccess h3{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px;}
 .msuccess p{color:var(--ink-2);font-size:14.5px;line-height:1.55;max-width:34ch;margin:0 auto 22px;}
 @media(prefers-reduced-motion:reduce){.modal.show,.modal-card{animation:none;}}
+
+/* ---------- Разворот аудита («Узнать подробнее») ---------- */
+.tbtn .tbtn-arw{display:inline-block;margin-left:7px;font-size:12px;transition:transform .3s var(--e);opacity:.75;}
+.tbtn[aria-expanded="true"] .tbtn-arw{transform:rotate(180deg);}
+.audit{margin-top:22px;overflow:hidden;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);}
+.audit[hidden]{display:none;}
+.js .audit:not([hidden]){animation:auditIn .45s var(--e);}
+@keyframes auditIn{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:none;}}
+.audit-inner{padding:clamp(24px,4vw,40px);}
+.audit-hook{max-width:64ch;}
+.audit-hook .tag{margin-bottom:14px;}
+.audit-hook h3{font-size:clamp(20px,3.2vw,27px);font-weight:700;letter-spacing:-.025em;line-height:1.18;}
+.audit-hook h3 em{font-style:normal;color:var(--accent);}
+.audit-hook p{margin-top:14px;color:var(--ink-2);font-size:1.02rem;line-height:1.6;}
+.audit-body{display:grid;grid-template-columns:1.15fr 1fr;gap:clamp(28px,5vw,56px);margin-top:30px;padding-top:30px;border-top:1px solid var(--line-2);}
+@media(max-width:760px){.audit-body{grid-template-columns:1fr;gap:28px;}}
+.audit-col h4{font-size:13px;font-weight:600;letter-spacing:.02em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.audit-steps{list-style:none;counter-reset:as;display:flex;flex-direction:column;gap:16px;}
+.audit-steps li{counter-increment:as;position:relative;padding-left:40px;font-size:14.5px;color:var(--ink-2);line-height:1.55;}
+.audit-steps li::before{content:counter(as);position:absolute;left:0;top:0;width:27px;height:27px;border-radius:50%;background:var(--accent-t);color:var(--accent);font-family:var(--mono);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;}
+.audit-steps li b{display:block;color:var(--ink);font-weight:600;font-size:15px;margin-bottom:2px;}
+.audit-steps li b span{float:right;font-family:var(--mono);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:-.02em;}
+.audit-deliver{list-style:none;display:flex;flex-direction:column;gap:11px;}
+.audit-deliver li{position:relative;padding-left:26px;font-size:14.5px;color:var(--ink);line-height:1.5;}
+.audit-deliver li::before{content:"";position:absolute;left:0;top:8px;width:14px;height:8px;border-left:2px solid var(--accent);border-bottom:2px solid var(--accent);transform:rotate(-45deg);}
+.audit-guard{margin-top:20px;font-size:12.5px;color:var(--muted);font-family:var(--mono);line-height:1.6;padding-top:16px;border-top:1px solid var(--line-2);}
+.audit-cta{display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap;margin-top:30px;padding:22px clamp(20px,3vw,28px);background:var(--ink);border-radius:var(--r);}
+.audit-cta-txt{max-width:46ch;}
+.audit-cta-txt b{display:block;color:#fff;font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:4px;}
+.audit-cta-txt span{color:#b9bdca;font-size:13.5px;line-height:1.5;}
+.audit-cta-act{display:flex;flex-direction:column;align-items:flex-start;gap:9px;}
+.audit-cta .btn-p{white-space:nowrap;}
+.audit-mail{font-size:13px;color:#8f94a3;text-decoration:underline;text-underline-offset:2px;transition:color .2s;}
+.audit-mail:hover{color:#fff;}
+@media(max-width:560px){.audit-cta{flex-direction:column;align-items:stretch;}.audit-cta-act{align-items:center;}.audit-cta .btn-p{width:100%;justify-content:center;}}
+@media(prefers-reduced-motion:reduce){.js .audit:not([hidden]){animation:none;}.tbtn .tbtn-arw{transition:none;}}
 </style>
 </head>
 <body>
@@ -477,7 +513,52 @@ h2 em{font-style:normal;color:var(--muted);}
         <div class="price">от 600 000 ₽ · 4–8 недель</div>
         <p class="desc">Полное исследование процессов, людей, технологий и данных. Подбор решений и готовые ТЗ для подрядчиков — отдавайте в работу завтра.</p>
         <ul><li>Карта процессов</li><li>Подбор технологий</li><li>Готовые ТЗ под ключ</li></ul>
-        <a href="https://brief.vidim.site" class="tbtn">Узнать подробнее</a>
+        <button type="button" class="tbtn" id="auditBtn" aria-expanded="false" aria-controls="auditPanel" onclick="toggleAudit()">Узнать подробнее<span class="tbtn-arw" aria-hidden="true">↓</span></button>
+      </div>
+    </div>
+
+    <!-- Разворот «Узнать подробнее» по аудиту -->
+    <div class="audit rv" id="auditPanel" role="region" aria-labelledby="auditBtn" hidden>
+      <div class="audit-inner">
+        <div class="audit-hook">
+          <span class="tag">Аудит + ТЗ · от 600 000 ₽</span>
+          <h3>Вы получаете не отчёт «что не так», а <em>готовые ТЗ</em></h3>
+          <p>Через 4–8 недель у вас на руках техзадания, которые можно завтра отдать подрядчику или своей команде — без месяцев проб, переписанных задач и переплат за неверно поставленную цель.</p>
+        </div>
+
+        <div class="audit-body">
+          <div class="audit-col">
+            <h4>Как идёт работа</h4>
+            <ol class="audit-steps">
+              <li><b>Исследование <span>1–2 нед.</span></b>Интервью с командой, доступ к данным и системам, карта процессов «как есть».</li>
+              <li><b>Анализ + ИИ <span>1–3 нед.</span></b>Узкие места, утечки и дубли; приоритизация по влиянию на прибыль; что автоматизировать, что перестроить, что купить.</li>
+              <li><b>ТЗ под ключ <span>1–3 нед.</span></b>Техзадания для подрядчиков и внутренней команды с критериями приёмки — отдавайте в работу.</li>
+            </ol>
+          </div>
+          <div class="audit-col">
+            <h4>Что остаётся у вас в руках</h4>
+            <ul class="audit-deliver">
+              <li>Карта процессов «как есть» → «как должно быть»</li>
+              <li>Реестр точек потерь с приоритетом по прибыли</li>
+              <li>Подбор технологий и подрядчиков — без vendor lock</li>
+              <li>Пакет ТЗ с критериями приёмки</li>
+            </ul>
+            <div class="audit-guard">NDA до старта · 152-ФЗ · стоимость Экспресс-диагностики зачитывается в аудит</div>
+          </div>
+        </div>
+
+        <div class="audit-cta">
+          <div class="audit-cta-txt">
+            <b>Начните с бесплатного разбора</b>
+            <span>30 минут по видео или телефону — разберём вашу ситуацию и скажем, что даст аудит именно вам. Без обязательств.</span>
+          </div>
+          <div class="audit-cta-act">
+            <button type="button" class="btn btn-p" onclick="openDiag('audit')">Заказать звонок
+              <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <a class="audit-mail" href="mailto:info@abc-xr.ru?subject=Запрос по аудиту%20—%20Vidim">или написать на info@abc-xr.ru</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -590,9 +671,17 @@ const DIAG_EMAILJS={publicKey:'Xvg10AeigkaR_anxB',service:'service_c8kqi5s',tpl:
 if(window.emailjs)emailjs.init({publicKey:DIAG_EMAILJS.publicKey});
 const diagEl=document.getElementById('diag');
 let diagSource='';
+const DIAG_CTX={
+  tier:{title:'Записаться на диагностику',sub:'Готовы начать без брифа? Оставьте контакты — свяжемся в течение рабочего дня, подпишем NDA и согласуем старт Экспресс-диагностики (5–7 дней, 200 000 ₽).',submit:'Отправить заявку'},
+  audit:{title:'Бесплатный разбор по аудиту',sub:'Оставьте контакты — перезвоним в течение рабочего дня. 30 минут по видео или телефону: разберём вашу ситуацию и скажем, что даст аудит именно вам. Без обязательств.',submit:'Заказать звонок'}
+};
 
 function openDiag(src){
-  diagSource=src||'';
+  diagSource=src||'tier';
+  const ctx=DIAG_CTX[diagSource]||DIAG_CTX.tier;
+  document.getElementById('diagTitle').textContent=ctx.title;
+  document.querySelector('#diagForm .modal-sub').textContent=ctx.sub;
+  document.getElementById('diagSubmit').textContent=ctx.submit;
   document.getElementById('diagForm').style.display='';
   document.getElementById('diagOk').style.display='none';
   document.getElementById('diagErr').classList.remove('show');
@@ -620,12 +709,19 @@ document.getElementById('diagFormEl').addEventListener('submit',function(e){
   if(!ok)return;
   if(document.getElementById('dCompanyUrl').value)return; // honeypot: тихо игнорируем ботов
   const btn=document.getElementById('diagSubmit');
+  const btnLabel=(DIAG_CTX[diagSource]||DIAG_CTX.tier).submit;
   btn.disabled=true;btn.textContent='Отправляем…';
 
   const pad=n=>(n<10?'0':'')+n,now=new Date();
   const sentAt=`${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   const cval=contact.value.trim();
   const isEmail=/@/.test(cval);
+  // Метки письма по источнику: заявка на диагностику vs заказ звонка по аудиту.
+  const isAudit=diagSource==='audit';
+  const flag=isAudit?'📞 ЗАКАЗ ЗВОНКА — АУДИТ':'🔥 ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)';
+  const industryLine=isAudit?'📞 Заказ бесплатного звонка-разбора по аудиту (от 600k)':'🔥 Прямая заявка на диагностику — клиент готов начать без брифа';
+  const painsLine=isAudit?'Запрос звонка-консультации по аудиту. Перезвонить клиенту.':'Готов начать Экспресс-диагностику сразу, минуя бриф. Связаться с клиентом.';
+  const kind=isAudit?'ЗАКАЗ ЗВОНКА ПО АУДИТУ':'ПРЯМАЯ ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)';
   // Шаблон template_jakea23 свёрстан под бриф и рендерит фиксированный набор переменных
   // (name, company, industry, size, role, client_email, pains, expectations, budget, risks…).
   // Кладём заявку ТОЛЬКО в эти поля, чтобы ничего не потерялось. Контакт всегда в client_email
@@ -635,22 +731,37 @@ document.getElementById('diagFormEl').addEventListener('submit',function(e){
     name:name.value.trim(), client_name:name.value.trim(),
     company:company.value.trim(), company_name:company.value.trim(),
     client_email:contactLine, client_phone:isEmail?'':cval,
-    company_industry:'🔥 ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)', company_size:company.value.trim(),
-    industry:'🔥 Прямая заявка на диагностику — клиент готов начать без брифа',
+    company_industry:flag, company_size:company.value.trim(),
+    industry:industryLine,
     size:'—', role:'—', company_role:'—',
-    pains:'Готов начать Экспресс-диагностику сразу, минуя бриф. Связаться с клиентом.', budget:'—',
+    pains:painsLine, budget:'—',
     expectations:comment?`Комментарий клиента: ${comment}`:'Без комментария',
-    brief_answers:`ПРЯМАЯ ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)\nИсточник: ${diagSource||'landing'}\nИмя: ${name.value.trim()}\nКомпания: ${company.value.trim()}\nКонтакт: ${cval}\nКомментарий: ${comment||'—'}`,
+    brief_answers:`${kind}\nИсточник: ${diagSource||'landing'}\nИмя: ${name.value.trim()}\nКомпания: ${company.value.trim()}\nКонтакт: ${cval}\nКомментарий: ${comment||'—'}`,
     risks_list:'—', top_risks:'—', risk_1:'—', risk_2:'—', risk_3:'—',
-    sent_at:sentAt, date:sentAt, session_id:'diag-'+now.getTime(),
-    api_status:'ПРЯМАЯ ЗАЯВКА — связаться с клиентом'
+    sent_at:sentAt, date:sentAt, session_id:(isAudit?'audit-':'diag-')+now.getTime(),
+    api_status:isAudit?'ЗАКАЗ ЗВОНКА — перезвонить клиенту':'ПРЯМАЯ ЗАЯВКА — связаться с клиентом'
   };
 
-  if(!window.emailjs){err.classList.add('show');btn.disabled=false;btn.textContent='Отправить заявку';return;}
+  if(!window.emailjs){err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;return;}
   emailjs.send(DIAG_EMAILJS.service,DIAG_EMAILJS.tpl,params)
     .then(()=>{document.getElementById('diagForm').style.display='none';document.getElementById('diagOk').style.display='';})
-    .catch(ex=>{console.error('[diag] email failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent='Отправить заявку';});
+    .catch(ex=>{console.error('[diag] email failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;});
 });
+
+/* ---------- Разворот аудита ---------- */
+function toggleAudit(){
+  const btn=document.getElementById('auditBtn'),panel=document.getElementById('auditPanel');
+  const open=btn.getAttribute('aria-expanded')==='true';
+  if(open){
+    panel.hidden=true;btn.setAttribute('aria-expanded','false');
+    btn.firstChild.textContent='Узнать подробнее';
+  }else{
+    panel.hidden=false;btn.setAttribute('aria-expanded','true');
+    btn.firstChild.textContent='Свернуть';
+    panel.classList.add('in');
+    setTimeout(()=>panel.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+  }
+}
 </script>
 </body>
 </html>
