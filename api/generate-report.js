@@ -1,13 +1,18 @@
 // =============================================================
-// api/generate-report.js  v2.2
-// Vercel Serverless Function — безопасный прокси Claude API
-// API-ключ хранится в Vercel Environment Variables (ANTHROPIC_API_KEY)
-// Браузер ключ никогда не видит
-// v2.1: короткий бриф из 6 вопросов (профиль · боль · зрелость данных ·
-//       зависимость от людей · прошлые попытки · цель/готовность/бюджет).
+// api/generate-report.js  v3.0
+// Vercel Serverless Function — безопасный прокси к LLM.
+// v3.0: переезд с Anthropic на Ollama Cloud (ollama.com).
+//       Причина: организация Anthropic была отключена.
+//       Ключ хранится в Vercel Env Vars (OLLAMA_API_KEY), браузер его не видит.
+//       Модель задаётся Env-переменной OLLAMA_MODEL (дефолт gpt-oss:120b) —
+//       можно менять в Vercel без правки кода.
+//       Структурный JSON гарантируется параметром `format` (JSON-схема Ollama).
+//       JSON-схема ответа НЕ менялась — совместима с рендером брифа.
 // v2.2: глубокая отраслевая привязка + аналитическая процедура рассуждения.
-//       JSON-схема ответа не менялась — совместима с рендером брифа.
 // =============================================================
+
+const OLLAMA_URL = 'https://ollama.com/api/chat';
+const MODEL = process.env.OLLAMA_MODEL || 'gpt-oss:120b';
 
 const SYSTEM_PROMPT = `Ты — старший операционный аналитик консалтинговой компании Видим (vidim.site). За плечами — десятки диагностик в разных отраслях российского бизнеса. Твоя сила в том, что ты рассуждаешь как отраслевой эксперт, а не даёшь универсальные советы «для любой компании».
 
@@ -47,15 +52,76 @@ const SYSTEM_PROMPT = `Ты — старший операционный анал
 
 ПРАВИЛА: Ровно 3 риска, 3-4 рекомендации, хотя бы одна quick_win. В signal каждого риска — отраслевая метрика. Никакого markdown. Только валидный JSON.`;
 
-module.exports = async function handler(req, res) {
+// JSON-схема для Ollama `format` — держит структуру ответа стабильной.
+const REPORT_SCHEMA = {
+  type: 'object',
+  properties: {
+    profile: {
+      type: 'object',
+      properties: {
+        industry: { type: 'string' },
+        size: { type: 'string' },
+        role: { type: 'string' },
+        maturity: { type: 'string' },
+        growth_stage: { type: 'string' },
+        summary: { type: 'string' }
+      },
+      required: ['industry', 'size', 'role', 'maturity', 'growth_stage', 'summary']
+    },
+    top_risks: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          code: { type: 'string' },
+          title: { type: 'string' },
+          what_happens: { type: 'string' },
+          impact: { type: 'string' },
+          severity: { type: 'string' },
+          signal: { type: 'string' }
+        },
+        required: ['code', 'title', 'what_happens', 'impact', 'severity', 'signal']
+      }
+    },
+    recommendations: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          action: { type: 'string' },
+          why: { type: 'string' },
+          horizon: { type: 'string' },
+          effort: { type: 'string' }
+        },
+        required: ['action', 'why', 'horizon', 'effort']
+      }
+    },
+    diagnostic_hypothesis: { type: 'string' },
+    next_step: {
+      type: 'object',
+      properties: {
+        product: { type: 'string' },
+        why: { type: 'string' },
+        what_will_get: { type: 'string' },
+        price: { type: 'string' },
+        duration: { type: 'string' },
+        guarantees: { type: 'array', items: { type: 'string' } }
+      },
+      required: ['product', 'why', 'what_will_get', 'price', 'duration', 'guarantees']
+    }
+  },
+  required: ['profile', 'top_risks', 'recommendations', 'diagnostic_hypothesis', 'next_step']
+};
+
+async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(503).json({ error: 'Claude API не настроен на сервере.', fallback: true });
+  const apiKey = process.env.OLLAMA_API_KEY;
+  if (!apiKey) return res.status(503).json({ error: 'LLM не настроен на сервере.', fallback: true });
 
   let body = req.body;
   if (typeof body === 'string') {
@@ -66,28 +132,36 @@ module.exports = async function handler(req, res) {
   if (prompt.length > 20000) return res.status(400).json({ error: 'prompt too long' });
 
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    const r = await fetch(OLLAMA_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, 'anthropic-version': '2023-06-01' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-5',
-        max_tokens: 4000,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: prompt }]
+        model: MODEL,
+        stream: false,
+        format: REPORT_SCHEMA,
+        options: { temperature: 0.4, num_predict: 3000 },
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          { role: 'user', content: prompt }
+        ]
       })
     });
-    if (!r.ok) { const e = await r.text(); throw new Error('Claude API ' + r.status + ': ' + e.slice(0,300)); }
+    if (!r.ok) { const e = await r.text(); throw new Error('Ollama ' + r.status + ': ' + e.slice(0,300)); }
     const json = await r.json();
-    const text = json.content?.[0]?.text;
+    const text = json.message?.content;
     if (!text) throw new Error('empty response');
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('no JSON found');
     const data = JSON.parse(match[0]);
     if (!data.profile || !Array.isArray(data.top_risks) || !data.next_step) throw new Error('invalid structure');
-    console.log('[vidim/api] v2.2 OK:', data.profile?.industry, '/', data.profile?.maturity);
-    return res.status(200).json({ data, source: 'claude' });
+    console.log('[vidim/api] v3.0 ollama OK:', data.profile?.industry, '/', data.profile?.maturity, '/ model', MODEL);
+    return res.status(200).json({ data, source: 'ollama' });
   } catch(err) {
     console.error('[vidim/api] error:', err.message);
     return res.status(500).json({ error: err.message, fallback: true });
   }
-};
+}
+
+module.exports = handler;
+// Vercel: даём функции время на генерацию (на Pro до 300с; на Hobby клампится к лимиту плана).
+module.exports.config = { maxDuration: 60 };
