@@ -230,6 +230,41 @@ h2 em{font-style:normal;color:var(--muted);}
 .cookie a{color:#fff;text-decoration:underline;}
 .cookie button{background:var(--accent);color:#fff;padding:9px 16px;border-radius:var(--r-s);font-size:13px;font-weight:600;width:100%;transition:background .2s;}
 .cookie button:hover{background:var(--accent-d);}
+
+/* ---------- MODAL: заявка на диагностику ---------- */
+:root{--z-modal:2000;}
+.modal{position:fixed;inset:0;z-index:var(--z-modal);display:none;align-items:center;justify-content:center;padding:20px;background:color-mix(in srgb,var(--ink) 46%,transparent);backdrop-filter:blur(4px);}
+.modal.show{display:flex;animation:mfade .25s var(--e);}
+@keyframes mfade{from{opacity:0;}to{opacity:1;}}
+.modal-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);width:100%;max-width:452px;max-height:calc(100vh - 40px);overflow-y:auto;padding:clamp(24px,4vw,34px);box-shadow:0 30px 80px -20px rgba(18,22,31,.5);animation:mup .35s var(--e);}
+@keyframes mup{from{opacity:0;transform:translateY(18px) scale(.98);}to{opacity:1;transform:none;}}
+.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:6px;}
+.modal-head h3{font-size:clamp(19px,3vw,22px);font-weight:700;letter-spacing:-.02em;line-height:1.2;}
+.modal-x{flex:none;width:32px;height:32px;border-radius:var(--r-s);display:inline-flex;align-items:center;justify-content:center;color:var(--muted);transition:background .2s,color .2s;margin:-4px -6px 0 0;}
+.modal-x:hover{background:var(--surface);color:var(--ink);}
+.modal-x svg{width:18px;height:18px;}
+.modal-sub{color:var(--ink-2);font-size:14px;line-height:1.5;margin-bottom:22px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--ink-2);margin-bottom:6px;letter-spacing:-.01em;}
+.field label .req{color:var(--signal-t);}
+.field input,.field textarea{width:100%;font-family:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:var(--r-s);padding:12px 14px;transition:border-color .2s,box-shadow .2s;line-height:1.5;}
+.field textarea{resize:vertical;min-height:74px;}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted);}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-t);}
+.field input.err,.field textarea.err{border-color:var(--signal);box-shadow:0 0 0 3px color-mix(in srgb,var(--signal) 16%,transparent);}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+.modal .btn-p{width:100%;justify-content:center;margin-top:6px;}
+.modal .btn-p[disabled]{opacity:.6;cursor:default;transform:none;box-shadow:none;}
+.mnote{margin-top:13px;font-size:12px;color:var(--muted);line-height:1.5;text-align:center;}
+.mnote a{color:var(--ink-2);text-decoration:underline;}
+.merr{margin-top:12px;font-size:13px;color:var(--signal-t);text-align:center;display:none;}
+.merr.show{display:block;}
+.msuccess{text-align:center;padding:14px 0 6px;}
+.msuccess .ok-ic{width:56px;height:56px;margin:0 auto 18px;border-radius:50%;background:var(--accent-t);display:flex;align-items:center;justify-content:center;color:var(--accent);}
+.msuccess .ok-ic svg{width:28px;height:28px;}
+.msuccess h3{font-size:20px;font-weight:700;letter-spacing:-.02em;margin-bottom:10px;}
+.msuccess p{color:var(--ink-2);font-size:14.5px;line-height:1.55;max-width:34ch;margin:0 auto 22px;}
+@media(prefers-reduced-motion:reduce){.modal.show,.modal-card{animation:none;}}
 </style>
 </head>
 <body>
@@ -434,7 +469,7 @@ h2 em{font-style:normal;color:var(--muted);}
         <p class="desc">Заходим в ваши системы и данные. Карта рисков: топ-10 узких мест, приоритизация по влиянию на прибыль, дорожная карта на 3–6 месяцев.</p>
         <ul><li>Карта рисков с приоритизацией</li><li>Топ-10 узких мест</li><li>Дорожная карта 3–6 мес.</li></ul>
         <div class="guard">✓ Гарантия возврата 100% &nbsp;·&nbsp; ✓ Зачёт в стоимость аудита</div>
-        <a href="https://brief.vidim.site" class="tbtn">Записаться на диагностику</a>
+        <button type="button" class="tbtn" onclick="openDiag('tier')">Записаться на диагностику</button>
       </div>
       <div class="tier">
         <div class="tier-step">Шаг 03 · Глубина</div>
@@ -482,11 +517,55 @@ h2 em{font-style:normal;color:var(--muted);}
   </div>
 </footer>
 
+<!-- MODAL: заявка на диагностику (для клиентов, готовых начать без брифа) -->
+<div class="modal" id="diag" role="dialog" aria-modal="true" aria-labelledby="diagTitle">
+  <div class="modal-card">
+    <div id="diagForm">
+      <div class="modal-head">
+        <h3 id="diagTitle">Записаться на диагностику</h3>
+        <button type="button" class="modal-x" aria-label="Закрыть" onclick="closeDiag()">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <p class="modal-sub">Готовы начать без брифа? Оставьте контакты — свяжемся в течение рабочего дня, подпишем NDA и согласуем старт Экспресс-диагностики (5–7 дней, 200 000 ₽).</p>
+      <form id="diagFormEl" novalidate>
+        <div class="field">
+          <label for="dName">Имя <span class="req">*</span></label>
+          <input type="text" id="dName" name="name" autocomplete="name" placeholder="Как к вам обращаться" required>
+        </div>
+        <div class="field">
+          <label for="dCompany">Компания <span class="req">*</span></label>
+          <input type="text" id="dCompany" name="company" autocomplete="organization" placeholder="Название компании" required>
+        </div>
+        <div class="field">
+          <label for="dContact">Телефон или e-mail <span class="req">*</span></label>
+          <input type="text" id="dContact" name="contact" placeholder="+7 … или you@company.ru" required>
+        </div>
+        <div class="field">
+          <label for="dComment">Что хотите разобрать</label>
+          <textarea id="dComment" name="comment" placeholder="Пара слов о задаче или узком месте (необязательно)"></textarea>
+        </div>
+        <input class="hp" type="text" id="dCompanyUrl" name="company_url" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <button type="submit" class="btn btn-p" id="diagSubmit">Отправить заявку</button>
+        <div class="merr" id="diagErr">Не удалось отправить. Напишите нам на <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a> или в <a href="https://t.me/vidim_consult">@vidim_consult</a>.</div>
+        <p class="mnote">Нажимая «Отправить», вы соглашаетесь с <a href="/privacy.html">политикой конфиденциальности</a>. Без звонков без спроса.</p>
+      </form>
+    </div>
+    <div class="msuccess" id="diagOk" style="display:none">
+      <div class="ok-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <h3>Заявка принята</h3>
+      <p>Спасибо! Свяжемся с вами в течение рабочего дня. Если срочно — пишите в <a href="https://t.me/vidim_consult">@vidim_consult</a>.</p>
+      <button type="button" class="btn btn-p" onclick="closeDiag()">Хорошо</button>
+    </div>
+  </div>
+</div>
+
 <div class="cookie" id="cookie">
   <p>Мы используем файлы cookie для аналитики и улучшения сайта. Оставаясь здесь, вы соглашаетесь с <a href="/privacy.html">политикой конфиденциальности</a>.</p>
   <button onclick="acceptCookies()">Хорошо</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 // header shadow on scroll
 const hd=document.getElementById('hd');
@@ -505,6 +584,73 @@ if('IntersectionObserver' in window){
 // cookie
 function acceptCookies(){localStorage.setItem('cookieAccepted','1');document.getElementById('cookie').classList.remove('show');}
 if(!localStorage.getItem('cookieAccepted')){setTimeout(()=>document.getElementById('cookie').classList.add('show'),1200);}
+
+/* ---------- Заявка на диагностику (EmailJS → info@abc-xr.ru) ---------- */
+const DIAG_EMAILJS={publicKey:'Xvg10AeigkaR_anxB',service:'service_c8kqi5s',tpl:'template_jakea23'};
+if(window.emailjs)emailjs.init({publicKey:DIAG_EMAILJS.publicKey});
+const diagEl=document.getElementById('diag');
+let diagSource='';
+
+function openDiag(src){
+  diagSource=src||'';
+  document.getElementById('diagForm').style.display='';
+  document.getElementById('diagOk').style.display='none';
+  document.getElementById('diagErr').classList.remove('show');
+  diagEl.classList.add('show');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('dName').focus(),60);
+}
+function closeDiag(){
+  diagEl.classList.remove('show');
+  document.body.style.overflow='';
+  const f=document.getElementById('diagFormEl');if(f)f.reset();
+  document.querySelectorAll('#diagFormEl .err').forEach(e=>e.classList.remove('err'));
+}
+diagEl.addEventListener('mousedown',e=>{if(e.target===diagEl)closeDiag();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&diagEl.classList.contains('show'))closeDiag();});
+
+document.getElementById('diagFormEl').addEventListener('submit',function(e){
+  e.preventDefault();
+  const name=document.getElementById('dName'),company=document.getElementById('dCompany'),contact=document.getElementById('dContact');
+  const comment=document.getElementById('dComment').value.trim();
+  const err=document.getElementById('diagErr');
+  err.classList.remove('show');
+  let ok=true;
+  [name,company,contact].forEach(inp=>{if(!inp.value.trim()){inp.classList.add('err');ok=false;}else inp.classList.remove('err');});
+  if(!ok)return;
+  if(document.getElementById('dCompanyUrl').value)return; // honeypot: тихо игнорируем ботов
+  const btn=document.getElementById('diagSubmit');
+  btn.disabled=true;btn.textContent='Отправляем…';
+
+  const pad=n=>(n<10?'0':'')+n,now=new Date();
+  const sentAt=`${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const cval=contact.value.trim();
+  const isEmail=/@/.test(cval);
+  // Шаблон template_jakea23 свёрстан под бриф и рендерит фиксированный набор переменных
+  // (name, company, industry, size, role, client_email, pains, expectations, budget, risks…).
+  // Кладём заявку ТОЛЬКО в эти поля, чтобы ничего не потерялось. Контакт всегда в client_email
+  // (в шаблоне нет client_phone). Тема содержит «бриф Видим» → правило кладёт письмо в папку Vidim.
+  const contactLine=cval+(isEmail?'':' (телефон)');
+  const params={
+    name:name.value.trim(), client_name:name.value.trim(),
+    company:company.value.trim(), company_name:company.value.trim(),
+    client_email:contactLine, client_phone:isEmail?'':cval,
+    company_industry:'🔥 ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)', company_size:company.value.trim(),
+    industry:'🔥 Прямая заявка на диагностику — клиент готов начать без брифа',
+    size:'—', role:'—', company_role:'—',
+    pains:'Готов начать Экспресс-диагностику сразу, минуя бриф. Связаться с клиентом.', budget:'—',
+    expectations:comment?`Комментарий клиента: ${comment}`:'Без комментария',
+    brief_answers:`ПРЯМАЯ ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)\nИсточник: ${diagSource||'landing'}\nИмя: ${name.value.trim()}\nКомпания: ${company.value.trim()}\nКонтакт: ${cval}\nКомментарий: ${comment||'—'}`,
+    risks_list:'—', top_risks:'—', risk_1:'—', risk_2:'—', risk_3:'—',
+    sent_at:sentAt, date:sentAt, session_id:'diag-'+now.getTime(),
+    api_status:'ПРЯМАЯ ЗАЯВКА — связаться с клиентом'
+  };
+
+  if(!window.emailjs){err.classList.add('show');btn.disabled=false;btn.textContent='Отправить заявку';return;}
+  emailjs.send(DIAG_EMAILJS.service,DIAG_EMAILJS.tpl,params)
+    .then(()=>{document.getElementById('diagForm').style.display='none';document.getElementById('diagOk').style.display='';})
+    .catch(ex=>{console.error('[diag] email failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent='Отправить заявку';});
+});
 </script>
 </body>
 </html>
