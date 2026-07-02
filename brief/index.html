@@ -541,26 +541,62 @@ function reportToText(d) {
   return t;
 }
 
+// Готовые EmailJS-шаблоны свёрстаны под гранулярные переменные (risk_1_title,
+// industry, structure, top_risks…). Собираем их из JSON-отчёта, чтобы красивые
+// письма рендерились без правки шаблонов.
 function sendEmails(report, apiOk) {
   if (!window.emailjs) return;
   const a = state.a;
+  const d = report || {};
+  const p = d.profile || {};
+  const risks = d.top_risks || [];
+  const recs = d.recommendations || [];
+  const ns = d.next_step || {};
+  const sevRu = { critical: 'критично', high: 'высокий', medium: 'средний' };
+
+  const pad = n => (n < 10 ? '0' : '') + n;
+  const now = new Date();
+  const sentAt = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+  const riskLine = r => r ? `${r.title || ''}${r.severity ? ` [${sevRu[r.severity] || r.severity}]` : ''}` : '—';
+  const riskFull = (r, i) => r ? `${i}. ${r.title || ''}${r.severity ? ` [${sevRu[r.severity] || r.severity}]` : ''}\n   ${r.what_happens || ''}\n   Чем грозит: ${r.impact || ''}${r.signal ? `\n   Сигнал: ${r.signal}` : ''}` : '';
+  const risksListText = risks.map((r, i) => riskFull(r, i + 1)).filter(Boolean).join('\n\n');
+  const recsText = recs.map((r, i) => `${i + 1}. ${r.action || ''}${r.why ? ' — ' + r.why : ''}`).join('\n');
+  const painsText = (a.pains || []).join(', ') + (a.painText ? ` — ${a.painText}` : '');
+
   const answers =
     `Отрасль: ${a.industry}\nРазмер: ${a.size} · Выручка: ${a.revenue} · Роль: ${a.role}\n` +
     `Боли: ${(a.pains || []).join(', ')}\n${a.painText ? 'Комментарий: ' + a.painText + '\n' : ''}` +
     `Данные: ${a.dataMaturity}\nЗависимость: ${a.ownerDependency}\n` +
     `Пробовали: ${a.tried}\nУспех: ${a.successResult}\n` +
     `Готовность: ${a.readiness} · Горизонт: ${a.horizon} · Бюджет: ${a.budget || '—'}`;
-  const reportText = reportToText(report);
 
   const common = {
-    client_name: a.name || '', client_email: a.email || '', client_phone: a.phone || '',
-    company_name: a.company || '', company_industry: a.industry || '', company_size: a.size || '',
-    company_revenue: a.revenue || '', client_role: a.role || '',
-    brief_answers: answers, report_text: reportText,
+    // контакты / профиль
+    name: a.name || '', client_name: a.name || '', client_email: a.email || '', client_phone: a.phone || '',
+    company: a.company || '', company_name: a.company || '',
+    industry: a.industry || p.industry || '', company_industry: p.industry || a.industry || '',
+    size: a.size || '', company_size: p.size || a.size || '',
+    role: a.role || '', company_role: a.role || '', client_role: a.role || '',
+    revenue: a.revenue || '', company_revenue: a.revenue || '', budget: a.budget || '—',
+    structure: [p.maturity, p.growth_stage].filter(Boolean).join(' · ') || '—',
+    // ответы (уведомление команде)
+    pains: painsText || '—', expectations: a.successResult || '—', brief_answers: answers,
+    // риски (оба письма)
+    risk_1: riskLine(risks[0]), risk_2: riskLine(risks[1]), risk_3: riskLine(risks[2]),
+    risk_1_title: (risks[0] || {}).title || '', risk_1_impact: (risks[0] || {}).impact || '',
+    risk_2_title: (risks[1] || {}).title || '', risk_2_impact: (risks[1] || {}).impact || '',
+    risk_3_title: (risks[2] || {}).title || '', risk_3_impact: (risks[2] || {}).impact || '',
+    risks_list: risksListText, top_risks: risksListText,
+    // отчёт клиенту
+    recommendations: recsText, next_step_why: ns.why || '', next_step_price: ns.price || '200 000 ₽',
+    report_text: reportToText(report),
+    // служебное
+    sent_at: sentAt, date: sentAt, session_id: 'brief-' + now.getTime(),
     api_status: apiOk ? 'OK (ИИ-отчёт сформирован)' : 'FALLBACK (нужен ручной разбор)'
   };
 
-  // 1) уведомление команде
+  // 1) уведомление команде → hello@vidim.site
   emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
     .catch(e => console.error('[brief] notify email failed', e));
   // 2) отчёт клиенту
