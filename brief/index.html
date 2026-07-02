@@ -188,7 +188,7 @@ input::placeholder,textarea::placeholder{color:var(--muted);}
 const EMAILJS = {
   publicKey: 'Xvg10AeigkaR_anxB',
   service:   'service_c8kqi5s',
-  tplNotify: 'template_jakea23',   // → hello@vidim.site
+  tplNotify: 'template_jakea23',   // → info@abc-xr.ru
   tplReport: 'template_6oo9hwy'    // → клиенту
 };
 if (window.emailjs) emailjs.init({ publicKey: EMAILJS.publicKey });
@@ -494,13 +494,13 @@ function renderReport(d) {
       ${ns.why ? `<p>${esc(ns.why)}</p>` : ''}
       ${ns.what_will_get ? `<p><b style="color:#fff">Что получите:</b> ${esc(ns.what_will_get)}</p>` : ''}
       ${guarantees ? `<div class="guarantees">${guarantees}</div>` : ''}
-      <a href="mailto:hello@vidim.site?subject=${encodeURIComponent('Экспресс-диагностика — ' + (a.company || ''))}" class="ns-btn">Записаться на диагностику
+      <a href="mailto:info@abc-xr.ru?subject=${encodeURIComponent('Экспресс-диагностика — ' + (a.company || ''))}" class="ns-btn">Записаться на диагностику
         <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
 
     <p class="rep-foot">Копия отчёта отправлена на <b>${esc(a.email || '')}</b>.<br>
-    Это первичная ИИ-оценка по вашим ответам — не заменяет полную диагностику. Вопросы: <a href="mailto:hello@vidim.site">hello@vidim.site</a></p>
+    Это первичная ИИ-оценка по вашим ответам — не заменяет полную диагностику. Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a></p>
   </div>`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -518,11 +518,11 @@ function renderPending() {
       <h2>Экспресс-диагностика</h2>
       <div class="ns-meta">200 000 ₽ · 5–7 рабочих дней</div>
       <p>Если хотите ускориться — напишите нам, обсудим вашу ситуацию напрямую.</p>
-      <a href="mailto:hello@vidim.site?subject=${encodeURIComponent('Бриф — ' + (a.company || ''))}" class="ns-btn">Написать нам
+      <a href="mailto:info@abc-xr.ru?subject=${encodeURIComponent('Бриф — ' + (a.company || ''))}" class="ns-btn">Написать нам
         <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
     </div>
-    <p class="rep-foot">Вопросы: <a href="mailto:hello@vidim.site">hello@vidim.site</a></p>
+    <p class="rep-foot">Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a></p>
   </div>`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -596,7 +596,7 @@ function sendEmails(report, apiOk) {
     api_status: apiOk ? 'OK (ИИ-отчёт сформирован)' : 'FALLBACK (нужен ручной разбор)'
   };
 
-  // 1) уведомление команде → hello@vidim.site
+  // 1) уведомление команде → info@abc-xr.ru
   emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
     .catch(e => console.error('[brief] notify email failed', e));
   // 2) отчёт клиенту
