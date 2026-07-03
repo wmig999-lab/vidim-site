@@ -320,7 +320,9 @@ async function sendInternalEmail(internal, meta, client) {
     });
     const to = process.env.VIDIM_TEAM_EMAIL || 'info@abc-xr.ru';
     // «бриф Видим» в теме — чтобы почтовое правило Яндекса клало письмо в папку Vidim
-    const subject = '🔒 Внутренний отчёт (бриф Видим) — ' + (m.industry || '') + ', ' + (m.size || '');
+    // «бриф Видим» — В САМОМ НАЧАЛЕ темы: правило Яндекса «тема содержит бриф Видим» → папка Vidim.
+    // (при MIME-свёртке длинной темы фраза не должна попадать на границу encoded-word)
+    const subject = 'бриф Видим · внутренний отчёт — ' + (m.industry || '') + ', ' + (m.size || '');
     await transporter.sendMail({
       from: '"Vidim Бриф" <' + user + '>', to, subject,
       text: textBody, html,
