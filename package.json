@@ -3,5 +3,5 @@
   "version": "1.0.0",
   "private": true,
   "description": "Vidim — лендинг и бриф, направление консалтинга ООО АйВиСистемз",
-  "engines": { "node": "20.x" }
+  "engines": { "node": "22.x" }
 }
