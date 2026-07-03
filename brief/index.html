@@ -536,23 +536,27 @@ function renderReport(d) {
 }
 
 /* ---- Модалка «Записаться на диагностику» ------------------------------ */
-function openDiagModal(ns) {
-  ns = ns || {};
+function openDiagModal(ns, opts) {
+  ns = ns || {}; opts = opts || {};
   const a = state.a || {};
   const product = ns.product || 'Экспресс-диагностика';
   const price = ns.price || '200 000 ₽';
+  const kind = opts.kind || 'diag';
+  const title = opts.title || 'Записаться на диагностику';
+  const eyebrow = opts.eyebrow || `${product} · ${price}`;
+  const sub = opts.sub || 'Оставьте контакты — аналитик свяжется в течение рабочего дня, подтвердит объём и сроки, ответит на вопросы.';
 
   const ov = document.createElement('div');
   ov.className = 'dm-overlay';
-  ov.innerHTML = `<div class="dm-card" role="dialog" aria-modal="true" aria-label="Заявка на ${esc(product)}">
+  ov.innerHTML = `<div class="dm-card" role="dialog" aria-modal="true" aria-label="${esc(title)}">
     <div class="dm-head">
       <div>
-        <div class="dm-eyebrow">${esc(product)} · ${esc(price)}</div>
-        <h3>Записаться на диагностику</h3>
+        <div class="dm-eyebrow">${esc(eyebrow)}</div>
+        <h3>${esc(title)}</h3>
       </div>
       <button type="button" class="dm-close" id="dmClose" aria-label="Закрыть">×</button>
     </div>
-    <p class="dm-sub">Оставьте контакты — аналитик свяжется в течение рабочего дня, подтвердит объём и сроки, ответит на вопросы.</p>
+    <p class="dm-sub">${esc(sub)}</p>
     <form id="dmForm" novalidate>
       <div class="dm-field">
         <label for="dmName">Имя <span class="req">*</span></label>
@@ -611,7 +615,7 @@ function openDiagModal(ns) {
       phone: phoneEl.value.trim(),
       email: (ov.querySelector('#dmEmail').value || '').trim(),
       comment: (ov.querySelector('#dmComment').value || '').trim(),
-      product, price
+      product, price, kind
     };
     sendDiagRequest(contact).then(() => {
       state.a.name = contact.name; state.a.phone = contact.phone;
@@ -636,34 +640,36 @@ function showDiagSuccess(card, contact) {
   card.querySelector('#dmDone').addEventListener('click', close);
 }
 
-// Заявка на диагностику → уведомление команде через существующий шаблон tplNotify.
-// Полный контекст брифа уже ушёл при генерации отчёта; здесь фиксируем телефон
-// и явный флаг «заявка на диагностику».
+// Заявка из брифа → уведомление команде через существующий шаблон tplNotify.
+// kind='diag' — запись на диагностику (после отчёта); kind='callback' — «написать нам»
+// с fallback-экрана, когда ИИ-отчёт не сформировался. Фиксируем телефон и явный флаг.
 function sendDiagRequest(c) {
   if (!window.emailjs) return Promise.resolve();
   const a = state.a || {};
+  const isCallback = c.kind === 'callback';
+  const flag = isCallback ? '📞 ЗАЯВКА НА ЗВОНОК (бриф без ИИ-отчёта)' : `⚡ ЗАЯВКА: ${(c.product || 'Экспресс-диагностика').toUpperCase()} (${c.price || '200 000 ₽'})`;
   const pad = n => (n < 10 ? '0' : '') + n;
   const now = new Date();
   const sentAt = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   const body =
-    `⚡ ЗАЯВКА НА ${(c.product || 'ЭКСПРЕСС-ДИАГНОСТИКУ').toUpperCase()} (${c.price || '200 000 ₽'})\n\n` +
+    `${flag}\n\n` +
     `Имя: ${c.name}\nТелефон: ${c.phone}\nEmail: ${c.email || '—'}\nКомпания: ${a.company || '—'}\n` +
     `Отрасль: ${a.industry || '—'} · Размер: ${a.size || '—'}\n` +
     (c.comment ? `Комментарий: ${c.comment}\n` : '') +
-    `\nЗаявка отправлена из брифа после показа отчёта.`;
+    `\n${isCallback ? 'Отправлена с fallback-экрана (ИИ-отчёт не сформировался).' : 'Заявка отправлена из брифа после показа отчёта.'}`;
   const payload = {
     name: c.name, client_name: c.name, client_phone: c.phone, client_email: c.email || a.email || '',
     company: a.company || '', company_name: a.company || '',
     industry: a.industry || '', company_industry: a.industry || '',
     size: a.size || '', company_size: a.size || '',
     role: a.role || '', client_role: a.role || '',
-    brief_answers: body, pains: 'Заявка на диагностику', expectations: c.comment || '—',
+    brief_answers: body, pains: isCallback ? 'Заявка на звонок' : 'Заявка на диагностику', expectations: c.comment || '—',
     report_text: body, next_step_price: c.price || '200 000 ₽',
-    sent_at: sentAt, date: sentAt, session_id: 'diag-' + now.getTime(),
-    api_status: '⚡ ЗАЯВКА НА ДИАГНОСТИКУ'
+    sent_at: sentAt, date: sentAt, session_id: (isCallback ? 'callback-' : 'diag-') + now.getTime(),
+    api_status: flag
   };
   return emailjs.send(EMAILJS.service, EMAILJS.tplNotify, payload)
-    .catch(e => { console.error('[brief] diag request email failed', e); });
+    .catch(e => { console.error('[brief] request email failed', e); });
 }
 
 function renderPending() {
@@ -678,13 +684,19 @@ function renderPending() {
       <div class="ns-tag">Пока суть да дело</div>
       <h2>Экспресс-диагностика</h2>
       <div class="ns-meta">200 000 ₽ · 5–7 рабочих дней</div>
-      <p>Если хотите ускориться — напишите нам, обсудим вашу ситуацию напрямую.</p>
-      <a href="mailto:info@abc-xr.ru?subject=${encodeURIComponent('Бриф — ' + (a.company || ''))}" class="ns-btn">Написать нам
+      <p>Если хотите ускориться — оставьте телефон, аналитик свяжется и обсудит вашу ситуацию напрямую.</p>
+      <button type="button" id="reqCallback" class="ns-btn">Написать нам
         <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+      </button>
     </div>
     <p class="rep-foot">Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a></p>
   </div>`;
+  app.querySelector('#reqCallback')?.addEventListener('click', () => openDiagModal(null, {
+    kind: 'callback',
+    title: 'Написать нам',
+    eyebrow: 'Обсудить вашу ситуацию',
+    sub: 'Оставьте контакты — аналитик Vidim свяжется в течение рабочего дня, разберёт ваши ответы и подскажет следующий шаг.'
+  }));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
