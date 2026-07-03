@@ -156,12 +156,41 @@ input::placeholder,textarea::placeholder{color:var(--muted);}
 .next p{font-size:14.5px;color:#c3c7d6;line-height:1.6;margin-bottom:16px;}
 .next .guarantees{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px;}
 .next .g{font-size:12.5px;color:#c3c7ff;background:rgba(167,176,255,.14);padding:6px 12px;border-radius:999px;}
-.next .ns-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;padding:14px 26px;border-radius:var(--r-s);font-weight:600;font-size:15.5px;transition:background .2s,transform .18s var(--e);}
+.next .ns-btn{display:inline-flex;align-items:center;gap:9px;background:var(--accent);color:#fff;padding:14px 26px;border:none;border-radius:var(--r-s);font-family:var(--sans);font-weight:600;font-size:15.5px;cursor:pointer;transition:background .2s,transform .18s var(--e);}
 .next .ns-btn:hover{background:var(--accent-d);transform:translateY(-1px);}
 
 .rep-foot{margin-top:30px;font-size:12.5px;color:var(--muted);line-height:1.6;text-align:center;}
 
 .notice{background:var(--accent-t);border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);border-radius:var(--r-s);padding:14px 16px;font-size:13.5px;color:var(--accent-d);line-height:1.5;margin-bottom:24px;}
+
+/* diagnostics request modal */
+.dm-overlay{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(18,22,31,.55);backdrop-filter:blur(3px);opacity:0;transition:opacity .22s var(--e);}
+.dm-overlay.on{opacity:1;}
+.dm-card{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);width:100%;max-width:440px;max-height:92vh;overflow-y:auto;padding:28px 26px;box-shadow:0 24px 60px -12px rgba(18,22,31,.4);transform:translateY(12px) scale(.98);transition:transform .26s var(--e);}
+.dm-overlay.on .dm-card{transform:none;}
+.dm-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px;}
+.dm-eyebrow{font-family:var(--mono);font-size:11.5px;color:var(--accent);letter-spacing:.02em;}
+.dm-card h3{font-size:1.25rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);margin:4px 0 6px;}
+.dm-card .dm-sub{font-size:13.5px;color:var(--muted);line-height:1.55;margin-bottom:20px;}
+.dm-close{flex:none;width:30px;height:30px;border-radius:var(--r-s);border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-size:17px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .18s,color .18s;}
+.dm-close:hover{background:var(--surface-2);color:var(--ink);}
+.dm-field{margin-bottom:14px;}
+.dm-field label{display:block;font-size:13px;font-weight:600;color:var(--ink);margin-bottom:6px;}
+.dm-field label .req{color:var(--signal);}
+.dm-field input,.dm-field textarea{width:100%;font-family:var(--sans);font-size:14.5px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-s);padding:11px 13px;outline:none;transition:border-color .18s,background .18s;}
+.dm-field input:focus,.dm-field textarea:focus{border-color:var(--accent);background:var(--bg);}
+.dm-field input.err,.dm-field textarea.err{border-color:var(--signal);}
+.dm-field textarea{resize:vertical;min-height:64px;}
+.dm-err{font-size:12px;color:var(--signal);margin-top:5px;display:none;}
+.dm-err.on{display:block;}
+.dm-submit{width:100%;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--accent);color:#fff;padding:14px 26px;border:none;border-radius:var(--r-s);font-family:var(--sans);font-weight:600;font-size:15.5px;cursor:pointer;margin-top:6px;transition:background .2s,transform .18s var(--e);}
+.dm-submit:hover{background:var(--accent-d);transform:translateY(-1px);}
+.dm-submit[disabled]{opacity:.6;cursor:default;transform:none;}
+.dm-note{font-size:11.5px;color:var(--muted);text-align:center;margin-top:14px;line-height:1.5;}
+.dm-ok{text-align:center;padding:14px 0 4px;}
+.dm-ok .dm-ok-ic{width:52px;height:52px;border-radius:50%;background:var(--accent-t);color:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.dm-ok h3{margin-bottom:8px;}
+.dm-ok p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
 </style>
 </head>
 <body>
@@ -494,15 +523,147 @@ function renderReport(d) {
       ${ns.why ? `<p>${esc(ns.why)}</p>` : ''}
       ${ns.what_will_get ? `<p><b style="color:#fff">Что получите:</b> ${esc(ns.what_will_get)}</p>` : ''}
       ${guarantees ? `<div class="guarantees">${guarantees}</div>` : ''}
-      <a href="mailto:info@abc-xr.ru?subject=${encodeURIComponent('Экспресс-диагностика — ' + (a.company || ''))}" class="ns-btn">Записаться на диагностику
+      <button type="button" id="reqDiag" class="ns-btn">Записаться на диагностику
         <svg viewBox="0 0 24 24" fill="none" width="15" height="15"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </a>
+      </button>
     </div>
 
     <p class="rep-foot">Копия отчёта отправлена на <b>${esc(a.email || '')}</b>.<br>
     Это первичная ИИ-оценка по вашим ответам — не заменяет полную диагностику. Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a></p>
   </div>`;
+  app.querySelector('#reqDiag')?.addEventListener('click', () => openDiagModal(ns));
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---- Модалка «Записаться на диагностику» ------------------------------ */
+function openDiagModal(ns) {
+  ns = ns || {};
+  const a = state.a || {};
+  const product = ns.product || 'Экспресс-диагностика';
+  const price = ns.price || '200 000 ₽';
+
+  const ov = document.createElement('div');
+  ov.className = 'dm-overlay';
+  ov.innerHTML = `<div class="dm-card" role="dialog" aria-modal="true" aria-label="Заявка на ${esc(product)}">
+    <div class="dm-head">
+      <div>
+        <div class="dm-eyebrow">${esc(product)} · ${esc(price)}</div>
+        <h3>Записаться на диагностику</h3>
+      </div>
+      <button type="button" class="dm-close" id="dmClose" aria-label="Закрыть">×</button>
+    </div>
+    <p class="dm-sub">Оставьте контакты — аналитик свяжется в течение рабочего дня, подтвердит объём и сроки, ответит на вопросы.</p>
+    <form id="dmForm" novalidate>
+      <div class="dm-field">
+        <label for="dmName">Имя <span class="req">*</span></label>
+        <input id="dmName" name="name" type="text" value="${esc(a.name || '')}" placeholder="Как к вам обращаться" autocomplete="name">
+        <div class="dm-err" data-for="dmName">Укажите имя</div>
+      </div>
+      <div class="dm-field">
+        <label for="dmPhone">Телефон <span class="req">*</span></label>
+        <input id="dmPhone" name="phone" type="tel" value="${esc(a.phone || '')}" placeholder="+7 900 000-00-00" autocomplete="tel">
+        <div class="dm-err" data-for="dmPhone">Укажите телефон для связи</div>
+      </div>
+      <div class="dm-field">
+        <label for="dmEmail">Email</label>
+        <input id="dmEmail" name="email" type="email" value="${esc(a.email || '')}" placeholder="you@company.ru" autocomplete="email">
+      </div>
+      <div class="dm-field">
+        <label for="dmComment">Комментарий <span style="color:var(--muted);font-weight:400">— необязательно</span></label>
+        <textarea id="dmComment" name="comment" placeholder="Удобное время для звонка, вопросы"></textarea>
+      </div>
+      <button type="submit" class="dm-submit" id="dmSubmit">Отправить заявку</button>
+      <p class="dm-note">Нажимая «Отправить», вы соглашаетесь на обработку контактных данных для связи по заявке.</p>
+    </form>
+  </div>`;
+  document.body.appendChild(ov);
+  document.body.style.overflow = 'hidden';
+  requestAnimationFrame(() => ov.classList.add('on'));
+
+  const close = () => {
+    ov.classList.remove('on');
+    document.body.style.overflow = '';
+    setTimeout(() => ov.remove(), 260);
+    document.removeEventListener('keydown', onKey);
+  };
+  const onKey = e => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  ov.addEventListener('click', e => { if (e.target === ov) close(); });
+  ov.querySelector('#dmClose').addEventListener('click', close);
+
+  const form = ov.querySelector('#dmForm');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const nameEl = ov.querySelector('#dmName');
+    const phoneEl = ov.querySelector('#dmPhone');
+    let ok = true;
+    [[nameEl, (nameEl.value || '').trim().length > 0], [phoneEl, (phoneEl.value || '').replace(/[^\d]/g, '').length >= 6]].forEach(([el, valid]) => {
+      const err = ov.querySelector(`.dm-err[data-for="${el.id}"]`);
+      if (!valid) { el.classList.add('err'); if (err) err.classList.add('on'); ok = false; }
+      else { el.classList.remove('err'); if (err) err.classList.remove('on'); }
+    });
+    if (!ok) { (nameEl.classList.contains('err') ? nameEl : phoneEl).focus(); return; }
+
+    const btn = ov.querySelector('#dmSubmit');
+    btn.disabled = true; btn.textContent = 'Отправляем…';
+    const contact = {
+      name: nameEl.value.trim(),
+      phone: phoneEl.value.trim(),
+      email: (ov.querySelector('#dmEmail').value || '').trim(),
+      comment: (ov.querySelector('#dmComment').value || '').trim(),
+      product, price
+    };
+    sendDiagRequest(contact).then(() => {
+      state.a.name = contact.name; state.a.phone = contact.phone;
+      if (contact.email) state.a.email = contact.email;
+      showDiagSuccess(ov.querySelector('.dm-card'), contact);
+    });
+  });
+}
+
+function showDiagSuccess(card, contact) {
+  card.innerHTML = `<div class="dm-ok">
+    <div class="dm-ok-ic"><svg viewBox="0 0 24 24" fill="none" width="26" height="26"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3>Заявка принята</h3>
+    <p>Спасибо, ${esc(contact.name)}! Аналитик Vidim свяжется с вами по номеру <b>${esc(contact.phone)}</b> в течение рабочего дня.</p>
+    <button type="button" class="dm-submit" id="dmDone">Закрыть</button>
+  </div>`;
+  const close = () => {
+    const ov = card.closest('.dm-overlay');
+    ov.classList.remove('on'); document.body.style.overflow = '';
+    setTimeout(() => ov.remove(), 260);
+  };
+  card.querySelector('#dmDone').addEventListener('click', close);
+}
+
+// Заявка на диагностику → уведомление команде через существующий шаблон tplNotify.
+// Полный контекст брифа уже ушёл при генерации отчёта; здесь фиксируем телефон
+// и явный флаг «заявка на диагностику».
+function sendDiagRequest(c) {
+  if (!window.emailjs) return Promise.resolve();
+  const a = state.a || {};
+  const pad = n => (n < 10 ? '0' : '') + n;
+  const now = new Date();
+  const sentAt = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  const body =
+    `⚡ ЗАЯВКА НА ${(c.product || 'ЭКСПРЕСС-ДИАГНОСТИКУ').toUpperCase()} (${c.price || '200 000 ₽'})\n\n` +
+    `Имя: ${c.name}\nТелефон: ${c.phone}\nEmail: ${c.email || '—'}\nКомпания: ${a.company || '—'}\n` +
+    `Отрасль: ${a.industry || '—'} · Размер: ${a.size || '—'}\n` +
+    (c.comment ? `Комментарий: ${c.comment}\n` : '') +
+    `\nЗаявка отправлена из брифа после показа отчёта.`;
+  const payload = {
+    name: c.name, client_name: c.name, client_phone: c.phone, client_email: c.email || a.email || '',
+    company: a.company || '', company_name: a.company || '',
+    industry: a.industry || '', company_industry: a.industry || '',
+    size: a.size || '', company_size: a.size || '',
+    role: a.role || '', client_role: a.role || '',
+    brief_answers: body, pains: 'Заявка на диагностику', expectations: c.comment || '—',
+    report_text: body, next_step_price: c.price || '200 000 ₽',
+    sent_at: sentAt, date: sentAt, session_id: 'diag-' + now.getTime(),
+    api_status: '⚡ ЗАЯВКА НА ДИАГНОСТИКУ'
+  };
+  return emailjs.send(EMAILJS.service, EMAILJS.tplNotify, payload)
+    .catch(e => { console.error('[brief] diag request email failed', e); });
 }
 
 function renderPending() {
