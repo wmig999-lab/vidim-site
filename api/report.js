@@ -185,7 +185,7 @@ function internalToText(i) {
   i = i || {};
   const dd = i.deep_diagnosis || {}, pb = i.industry_playbook || {}, cs = i.call_strategy || {}, hf = i.honest_flags || {};
   const L = [];
-  const bullet = (arr, fn) => (arr || []).map(fn).join('\n');
+  const bullet = (arr, fn) => (Array.isArray(arr) ? arr : []).map(fn).join('\n');
   L.push('═══ УГЛУБЛЁННАЯ ДИАГНОСТИКА (для команды) ═══');
   L.push(bullet(dd.risks, (r, n) => `${n + 1}. [${r.severity || ''}] ${r.title || ''}\n   Механизм: ${r.mechanism || ''}\n   Последствия: ${r.impact_rub || ''}\n   Сигнал: ${r.signal || ''}`));
   L.push('\nГипотезы корневой причины:');
