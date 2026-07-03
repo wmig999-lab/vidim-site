@@ -1,6 +1,8 @@
 // =============================================================
-// api/generate-report.js  v3.0
+// api/generate-report.js  v4.0
 // Vercel Serverless Function — безопасный прокси к LLM.
+// v4.0: внутренний отчёт по брифу (internal) + server-side письмо команде
+//       через EmailJS REST; internal вырезается из ответа браузеру; teamNotified.
 // v3.0: переезд с Anthropic на Ollama Cloud (ollama.com).
 //       Причина: организация Anthropic была отключена.
 //       Ключ хранится в Vercel Env Vars (OLLAMA_API_KEY), браузер его не видит.
@@ -308,7 +310,7 @@ async function handler(req, res) {
     if (!match) throw new Error('no JSON found');
     const data = JSON.parse(match[0]);
     if (!data.profile || !Array.isArray(data.top_risks) || !data.next_step) throw new Error('invalid structure');
-    console.log('[vidim/api] v3.0 ollama OK:', data.profile?.industry, '/', data.profile?.maturity, '/ model', MODEL);
+    console.log('[vidim/api] v4.0 ollama OK:', data.profile?.industry, '/', data.profile?.maturity, '/ model', MODEL);
     const internal = stripInternal(data);
     const teamNotified = await sendInternalEmail(internal, {
       industry: data.profile && data.profile.industry, size: data.profile && data.profile.size,
