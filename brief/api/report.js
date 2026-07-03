@@ -257,8 +257,10 @@ async function sendInternalEmail(internal, meta) {
           company_industry: m.industry || '', company_size: m.size || '',
           client_name: m.name || '', client_phone: m.phone || '', client_email: m.email || '',
           company_name: m.company || '',
-          brief_answers: body, report_text: body,
-          api_status: '🔒 ВНУТРЕННИЙ ОТЧЁТ', pains: 'внутренний разбор'
+          // заполняем верхние поля шаблона (чтобы не пустовали) и кладём ДОСЬЕ в expectations — оно рендерится
+          company: m.company || '—', industry: m.industry || '—', size: m.size || '—',
+          expectations: body, brief_answers: body, report_text: body,
+          api_status: '🔒 ВНУТРЕННИЙ ОТЧЁТ', pains: 'внутренний разбор (полностью — в блоке «Ожидания» ниже)'
         }
       })
     });
