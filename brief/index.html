@@ -455,18 +455,18 @@ async function submit() {
   const phaseEl = document.getElementById('phase');
   const timer = setInterval(() => { pi = (pi + 1) % PHASES.length; if (phaseEl) phaseEl.textContent = PHASES[pi]; }, 3200);
 
-  let report = null, apiOk = false;
+  let report = null, apiOk = false, teamNotified = false;
   try {
     const r = await fetch('/api/generate-report', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: buildPrompt() })
+      body: JSON.stringify({ prompt: buildPrompt(), name: state.a.name, email: state.a.email, phone: state.a.phone, company: state.a.company })
     });
     const j = await r.json();
-    if (r.ok && j.data) { report = j.data; apiOk = true; }
+    if (r.ok && j.data) { report = j.data; apiOk = true; teamNotified = !!j.teamNotified; }
   } catch (err) { console.error('[brief] api error', err); }
 
   clearInterval(timer);
-  sendEmails(report, apiOk);   // не блокируем показ отчёта
+  sendEmails(report, apiOk, teamNotified);   // не блокируем показ отчёта
   if (apiOk) renderReport(report); else renderPending();
 }
 
@@ -717,7 +717,7 @@ function reportToText(d) {
 // Готовые EmailJS-шаблоны свёрстаны под гранулярные переменные (risk_1_title,
 // industry, structure, top_risks…). Собираем их из JSON-отчёта, чтобы красивые
 // письма рендерились без правки шаблонов.
-function sendEmails(report, apiOk) {
+function sendEmails(report, apiOk, teamNotified) {
   if (!window.emailjs) return;
   const a = state.a;
   const d = report || {};
@@ -769,12 +769,17 @@ function sendEmails(report, apiOk) {
     api_status: apiOk ? 'OK (ИИ-отчёт сформирован)' : 'FALLBACK (нужен ручной разбор)'
   };
 
-  // 1) уведомление команде → info@abc-xr.ru
-  emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
-    .catch(e => console.error('[brief] notify email failed', e));
-  // 2) отчёт клиенту
-  if (a.email) emailjs.send(EMAILJS.service, EMAILJS.tplReport, common)
-    .catch(e => console.error('[brief] report email failed', e));
+  // apiOk: команду уже уведомил сервер (внутренний отчёт). Клиенту шлём его отчёт.
+  // fallback: сервер не сгенерил — шлём короткое уведомление команде, чтобы лид не потерялся.
+  if (apiOk) {
+    if (a.email) emailjs.send(EMAILJS.service, EMAILJS.tplReport, common)
+      .catch(e => console.error('[brief] report email failed', e));
+    if (!teamNotified) emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
+      .catch(e => console.error('[brief] team fallback notify failed', e));
+  } else {
+    emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
+      .catch(e => console.error('[brief] fallback notify failed', e));
+  }
 }
 
 /* ---- Старт ------------------------------------------------------------ */
