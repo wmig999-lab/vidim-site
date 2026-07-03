@@ -1,0 +1,9 @@
+{
+  "name": "vidim-brief",
+  "version": "1.0.0",
+  "private": true,
+  "engines": { "node": "22.x" },
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}
