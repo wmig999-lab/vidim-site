@@ -15,6 +15,7 @@
 
 const OLLAMA_URL = 'https://ollama.com/api/chat';
 const MODEL = process.env.OLLAMA_MODEL || 'gpt-oss:120b';
+const nodemailer = require('nodemailer');
 
 const SYSTEM_PROMPT = `Ты — старший операционный аналитик консалтинговой компании Видим (vidim.site). За плечами — десятки диагностик в разных отраслях российского бизнеса. Твоя сила в том, что ты рассуждаешь как отраслевой эксперт, а не даёшь универсальные советы «для любой компании».
 
@@ -222,53 +223,112 @@ function stripInternal(data) {
   return internal || null;
 }
 
-const EMAILJS = {
-  url: 'https://api.emailjs.com/api/v1.0/email/send',
-  service: 'service_c8kqi5s',
-  publicKey: 'Xvg10AeigkaR_anxB',
-  tplNotify: 'template_jakea23'
-};
+// HTML-экранирование для сборки письма/вложения
+function h(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
-async function sendInternalEmail(internal, meta) {
-  const key = process.env.EMAILJS_PRIVATE_KEY;
-  if (!key) { console.warn('[vidim/api] EMAILJS_PRIVATE_KEY not set — internal email skipped'); return false; }
+// Красивый брендированный HTML внутреннего отчёта (тело письма + вложение internal-report.html)
+function buildInternalHtml(internal, meta, client) {
+  const i = internal || {}, m = meta || {}, c = client || {};
+  const dd = i.deep_diagnosis || {}, pb = i.industry_playbook || {}, cs = i.call_strategy || {}, hf = i.honest_flags || {};
+  const p = c.profile || {};
+  const arr = x => Array.isArray(x) ? x : [];
+  const sevBg = { critical: '#c0281a', high: '#b64c1b', medium: '#70747e' };
+  const sevRu = { critical: 'критично', high: 'высокий', medium: 'средний' };
+  const ul = (items, fn) => { const a = arr(items); return a.length ? '<ul style="margin:6px 0 0;padding-left:20px">' + a.map(fn).join('') + '</ul>' : '<div style="color:#70747e;font-size:13px">—</div>'; };
+  const sec = (title, inner) => '<div style="margin-top:26px"><div style="font:600 12px \'Spline Sans Mono\',monospace;letter-spacing:.04em;text-transform:uppercase;color:#4252cd;border-bottom:1px solid #dde0e4;padding-bottom:6px;margin-bottom:12px">' + h(title) + '</div>' + inner + '</div>';
+
+  const S = [];
+  S.push('<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">');
+  S.push('<title>Внутренний отчёт — ' + h(m.company || m.industry || 'Vidim') + '</title>');
+  S.push('<link href="https://fonts.bunny.net/css?family=onest:400,500,600,700|spline-sans-mono:400,500&display=swap" rel="stylesheet">');
+  S.push('</head><body style="margin:0;background:#eceef2;font-family:Onest,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#12161f;line-height:1.55">');
+  S.push('<div style="max-width:720px;margin:0 auto;background:#fbfcfe">');
+  // header
+  S.push('<div style="background:#12161f;color:#fff;padding:26px 28px">' +
+    '<div style="font:600 12px Spline Sans Mono,monospace;color:#8f96de;letter-spacing:.05em">VIDIM · ВНУТРЕННИЙ ОТЧЁТ (не для клиента)</div>' +
+    '<div style="font-weight:700;font-size:22px;letter-spacing:-.02em;margin-top:8px">' + h(m.industry || 'Бриф') + '</div>' +
+    '<div style="color:#c3c7d6;font-size:13.5px;margin-top:6px">' + h(m.size || '') + '</div></div>');
+  // lead / contacts
+  S.push('<div style="padding:22px 28px">');
+  S.push('<div style="background:#f2f3f7;border:1px solid #dde0e4;border-radius:10px;padding:14px 16px;font-size:14px">' +
+    '<b>Лид:</b> ' + h(m.name || '—') + ' · ' + h(m.company || '—') + '<br>' +
+    '<b>Телефон:</b> ' + h(m.phone || '—') + ' &nbsp; <b>Email:</b> ' + h(m.email || '—') + '<br>' +
+    '<b>Отрасль:</b> ' + h(m.industry || '—') + ' &nbsp; <b>Размер:</b> ' + h(m.size || '—') +
+    '<span style="color:#70747e"> · модель ' + h(m.apiModel || '') + '</span></div>');
+
+  // client-facing first-cut (что увидел клиент)
+  const cr = [];
+  if (p.summary) cr.push('<p style="font-size:14px;color:#4d535e;margin:0 0 10px">' + h(p.summary) + '</p>');
+  cr.push(ul(c.top_risks, r => '<li style="margin-bottom:4px"><b>' + h(r.title || '') + '</b>' + (r.impact ? ' <span style="color:#9e441d">— ' + h(r.impact) + '</span>' : '') + '</li>'));
+  if (c.diagnostic_hypothesis) cr.push('<p style="font-size:13.5px;color:#4d535e;margin:10px 0 0"><b>Гипотеза (клиенту):</b> ' + h(c.diagnostic_hypothesis) + '</p>');
+  S.push(sec('Что получил клиент (первичка)', cr.join('')));
+
+  // deep diagnosis
+  const risksHtml = arr(dd.risks).map(r => '<div style="border:1px solid #dde0e4;border-radius:10px;padding:14px 16px;margin-bottom:10px">' +
+    '<div style="display:flex;justify-content:space-between;gap:10px"><b style="font-size:15px">' + h(r.title || '') + '</b>' +
+    '<span style="flex:none;font:600 11px Spline Sans Mono,monospace;color:#fff;background:' + (sevBg[r.severity] || '#70747e') + ';padding:3px 8px;border-radius:6px;height:fit-content">' + h(sevRu[r.severity] || r.severity || '') + '</span></div>' +
+    '<div style="font-size:13.5px;color:#4d535e;margin-top:8px"><b>Механизм:</b> ' + h(r.mechanism || '') + '</div>' +
+    '<div style="font-size:13.5px;color:#9e441d;margin-top:4px"><b>Последствия:</b> ' + h(r.impact_rub || '') + '</div>' +
+    '<div style="font-size:12.5px;color:#70747e;margin-top:4px;font-family:Spline Sans Mono,monospace">▸ ' + h(r.signal || '') + '</div></div>').join('') || '<div style="color:#70747e">—</div>';
+  S.push(sec('Углублённая диагностика (' + arr(dd.risks).length + ' рисков)', risksHtml +
+    '<div style="margin-top:12px;font-size:13.5px"><b>Гипотезы корневой причины:</b>' + ul(dd.root_cause_hypotheses, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px;color:#4d535e"><b>Бенчмарки (типично):</b>' + ul(dd.benchmarks, x => '<li>' + h(x) + '</li>') + '</div>'));
+
+  // industry playbook
+  S.push(sec('Отраслевой пошаговый план',
+    '<div style="font-size:13.5px"><b>Типовые проблемы отрасли:</b>' + ul(pb.typical_problems, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px"><b>План по шагам:</b><ol style="margin:6px 0 0;padding-left:20px">' +
+    arr(pb.step_plan).map(s => '<li style="margin-bottom:5px"><b>' + h(s.step || '') + '</b> <span style="font:600 11px Spline Sans Mono,monospace;color:#4252cd">[' + h(s.horizon || '') + ']</span><br><span style="color:#4d535e">' + h(s.why || '') + '</span></li>').join('') + '</ol></div>'));
+
+  // call strategy
+  S.push(sec('Стратегия звонка',
+    '<div style="font-size:13.5px"><b>Цепляющие вопросы:</b>' + ul(cs.hook_questions, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px"><b>На что давить:</b>' + ul(cs.pressure_points, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px"><b>Возражения → ответы:</b>' + ul(cs.objections, o => '<li style="margin-bottom:4px"><b>«' + h(o.objection || '') + '»</b> → ' + h(o.response || '') + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px;background:#eceef9;border-radius:8px;padding:10px 12px"><b>Апсейл-путь:</b> ' + h(cs.upsell_path || '') + '</div>'));
+
+  // honest flags
+  S.push(sec('Честные флаги',
+    '<div style="font-size:13.5px"><b>Додумали vs факт:</b>' + ul(hf.assumptions_vs_facts, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px"><b>Уточнить на диагностике:</b>' + ul(hf.verify_on_diagnostic, x => '<li>' + h(x) + '</li>') + '</div>' +
+    '<div style="margin-top:10px;font-size:13.5px;color:#9e441d"><b>Red flags клиента:</b>' + ul(hf.client_red_flags, x => '<li>' + h(x) + '</li>') + '</div>'));
+
+  S.push('</div>'); // padding
+  S.push('<div style="padding:16px 28px;border-top:1px solid #dde0e4;color:#70747e;font-size:11.5px">🔒 Внутренний документ Vidim · ООО «АйВиСистемз» · не пересылать клиенту</div>');
+  S.push('</div></body></html>');
+  return S.join('');
+}
+
+// Отправка внутреннего отчёта команде через SMTP (Яндекс) + вложение internal-report.html
+async function sendInternalEmail(internal, meta, client) {
+  const user = process.env.SMTP_USER, pass = process.env.SMTP_PASS;
+  if (!user || !pass) { console.warn('[vidim/api] SMTP_USER/SMTP_PASS not set — internal email skipped'); return false; }
   if (!internal) { console.warn('[vidim/api] internal missing — email skipped'); return false; }
-  const controller = new AbortController();
-  const to = setTimeout(() => controller.abort(), 8000);
   try {
     const m = meta || {};
-    const body =
-      `🔒 ВНУТРЕННИЙ ОТЧЁТ ПО БРИФУ (не для клиента)\n\n` +
-      `Лид: ${m.name || '—'} · ${m.company || '—'}\n` +
-      `Телефон: ${m.phone || '—'} · Email: ${m.email || '—'}\n` +
-      `Отрасль: ${m.industry || '—'} · Размер: ${m.size || '—'}\n` +
-      `Модель: ${m.apiModel || ''}\n\n` +
+    const html = buildInternalHtml(internal, meta, client);
+    const textBody =
+      '🔒 ВНУТРЕННИЙ ОТЧЁТ ПО БРИФУ (не для клиента)\n\n' +
+      'Лид: ' + (m.name || '—') + ' · ' + (m.company || '—') + '\n' +
+      'Телефон: ' + (m.phone || '—') + ' · Email: ' + (m.email || '—') + '\n' +
+      'Отрасль: ' + (m.industry || '—') + ' · Размер: ' + (m.size || '—') + '\n\n' +
       internalToText(internal);
-    const r = await fetch(EMAILJS.url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: controller.signal,
-      body: JSON.stringify({
-        service_id: EMAILJS.service,
-        template_id: EMAILJS.tplNotify,
-        user_id: EMAILJS.publicKey,
-        accessToken: key,
-        template_params: {
-          company_industry: m.industry || '', company_size: m.size || '',
-          client_name: m.name || '', client_phone: m.phone || '', client_email: m.email || '',
-          company_name: m.company || '',
-          // заполняем верхние поля шаблона (чтобы не пустовали) и кладём ДОСЬЕ в expectations — оно рендерится
-          company: m.company || '—', industry: m.industry || '—', size: m.size || '—',
-          expectations: body, brief_answers: body, report_text: body,
-          api_status: '🔒 ВНУТРЕННИЙ ОТЧЁТ', pains: 'внутренний разбор (полностью — в блоке «Ожидания» ниже)'
-        }
-      })
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.yandex.ru', port: 465, secure: true,
+      auth: { user, pass },
+      connectionTimeout: 9000, greetingTimeout: 9000, socketTimeout: 12000
     });
-    if (!r.ok) { const t = await r.text(); console.error('[vidim/api] internal email failed', r.status, t.slice(0, 200)); return false; }
-    console.log('[vidim/api] internal email sent → info@');
+    const to = process.env.VIDIM_TEAM_EMAIL || 'info@abc-xr.ru';
+    // «бриф Видим» в теме — чтобы почтовое правило Яндекса клало письмо в папку Vidim
+    const subject = '🔒 Внутренний отчёт (бриф Видим) — ' + (m.industry || '') + ', ' + (m.size || '');
+    await transporter.sendMail({
+      from: '"Vidim Бриф" <' + user + '>', to, subject,
+      text: textBody, html,
+      attachments: [{ filename: 'internal-report.html', content: html, contentType: 'text/html; charset=utf-8' }]
+    });
+    console.log('[vidim/api] internal report sent via SMTP → ' + to);
     return true;
-  } catch (e) { console.error('[vidim/api] internal email exception', e.message); return false; }
-  finally { clearTimeout(to); }
+  } catch (e) { console.error('[vidim/api] SMTP internal email failed', e.message); return false; }
 }
 
 async function handler(req, res) {
@@ -318,7 +378,7 @@ async function handler(req, res) {
       industry: data.profile && data.profile.industry, size: data.profile && data.profile.size,
       name: body.name, email: body.email, phone: body.phone, company: body.company,
       apiModel: MODEL
-    });
+    }, data);
     return res.status(200).json({ data, source: 'ollama', teamNotified });
   } catch(err) {
     console.error('[vidim/api] error:', err.message);
@@ -330,5 +390,6 @@ module.exports = handler;
 module.exports.internalToText = internalToText;
 module.exports.stripInternal = stripInternal;
 module.exports.sendInternalEmail = sendInternalEmail;
+module.exports.buildInternalHtml = buildInternalHtml;
 // Vercel: даём функции время на генерацию (на Pro до 300с; на Hobby клампится к лимиту плана).
 module.exports.config = { maxDuration: 60 };
