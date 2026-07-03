@@ -457,7 +457,7 @@ async function submit() {
 
   let report = null, apiOk = false, teamNotified = false;
   try {
-    const r = await fetch('/api/generate-report', {
+    const r = await fetch('/api/report', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt: buildPrompt(), name: state.a.name, email: state.a.email, phone: state.a.phone, company: state.a.company })
     });
