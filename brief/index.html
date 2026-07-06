@@ -205,6 +205,28 @@ input::placeholder,textarea::placeholder{color:var(--muted);}
   </script>
   <noscript><div><img src="https://mc.yandex.ru/watch/110439599" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
   <!-- /Yandex.Metrika counter -->
+  <!-- Vidim: цели Яндекс.Метрики для брифа (reachGoal) -->
+  <script>
+  (function(){
+    function goal(g){ try{ if(typeof ym==='function') ym(110439599,'reachGoal',g); }catch(e){} }
+    var startFired=false, doneFired=false;
+    document.addEventListener('click', function(e){
+      var b = e.target.closest && e.target.closest('button');
+      if (b && !startFired && /Далее/.test(b.textContent||'')) { startFired=true; goal('brief_start'); }
+    }, true);
+    var of = window.fetch;
+    if (of) window.fetch = function(){
+      var url = (arguments[0] && arguments[0].url) || arguments[0] || '';
+      var p = of.apply(this, arguments);
+      try {
+        if (typeof url==='string' && /\/api\/(report|generate-report)/.test(url)) {
+          p.then(function(r){ if(r && r.ok && !doneFired){ doneFired=true; goal('brief_done'); } }).catch(function(){});
+        }
+      } catch(e){}
+      return p;
+    };
+  })();
+  </script>
 </head>
 <body>
 
