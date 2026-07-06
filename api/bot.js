@@ -111,7 +111,7 @@ module.exports = async (req, res) => {
       });
       return res.status(200).json({ webhook: url, telegram: r });
     }
-    return res.status(200).send(`Vidim bot: OK | secret:${SECRET ? SECRET.length : 0} | build:v4 | keys:[${Object.keys(process.env).filter(k=>/webhook|secret|_bot|owner/i.test(k)).map(k=>JSON.stringify(k)).join(',')}]`);
+    return res.status(200).send(`Vidim bot: OK | secret:${SECRET ? SECRET.length : 0} | build:v5 | user:[${Object.keys(process.env).filter(k=>!/^(VERCEL|AWS|NODE|LAMBDA|X_AMZN|_HANDLER|PATH$|TZ$|LANG$|LD_|PWD$|HOME$|SHLVL$|NX_|PORT$|HOSTNAME$|CI$|NOW_)/.test(k)).sort().join(',')}]`);
   }
 
   if (req.method !== 'POST') return res.status(405).end();
