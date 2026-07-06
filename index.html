@@ -302,6 +302,129 @@ h2 em{font-style:normal;color:var(--muted);}
 @media(max-width:560px){.audit-cta{flex-direction:column;align-items:stretch;}.audit-cta-act{align-items:center;}.audit-cta .btn-p{width:100%;justify-content:center;}}
 @media(prefers-reduced-motion:reduce){.js .audit:not([hidden]){animation:none;}.tbtn .tbtn-arw{transition:none;}}
 </style>
+
+  <!-- SEO: canonical + OpenGraph image + Twitter card -->
+  <link rel="canonical" href="https://vidim.site/" />
+  <meta property="og:image" content="https://vidim.site/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://vidim.site/og-image.png" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://vidim.site/#org",
+      "name": "Vidim (Видим)",
+      "legalName": "ООО «АйВиСистемз»",
+      "url": "https://vidim.site/",
+      "email": "hello@vidim.site",
+      "identifier": [
+        {
+          "@type": "PropertyValue",
+          "propertyID": "ИНН",
+          "value": "0274908161"
+        },
+        {
+          "@type": "PropertyValue",
+          "propertyID": "ОГРН",
+          "value": "1150280056816"
+        }
+      ],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ул. Генерала Горбатова, 2",
+        "addressLocality": "Уфа",
+        "addressRegion": "Республика Башкортостан",
+        "addressCountry": "RU"
+      },
+      "sameAs": [
+        "https://t.me/vidim_consult"
+      ]
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://vidim.site/#service",
+      "name": "Vidim — операционный консалтинг и ИИ-диагностика бизнеса",
+      "slogan": "Внешний взгляд на ваш бизнес",
+      "url": "https://vidim.site/",
+      "parentOrganization": {
+        "@id": "https://vidim.site/#org"
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "Россия"
+      },
+      "description": "Диагностика скрытых операционных и финансовых рисков для компаний от 100 сотрудников: падение маржи, кассовые разрывы, рост дебиторской задолженности.",
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Продукты Vidim",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "RUB",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Бесплатный бриф с ИИ-анализом"
+            }
+          },
+          {
+            "@type": "Offer",
+            "price": "200000",
+            "priceCurrency": "RUB",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Экспресс-диагностика бизнеса"
+            }
+          },
+          {
+            "@type": "Offer",
+            "price": "600000",
+            "priceCurrency": "RUB",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Операционный аудит с готовыми ТЗ"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://vidim.site/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Что такое экспресс-диагностика бизнеса от Vidim?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Аудит операционных и финансовых рисков за 5–7 дней. Стоимость 200 000 ₽ с гарантией возврата 100%. При заказе аудита сумма зачитывается в его стоимость."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Каким компаниям подходит операционный консалтинг Vidim?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Компаниям от 100 сотрудников, где падает маржа, растёт дебиторка, возникают кассовые разрывы, бизнес не работает без собственника."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Как работает бесплатный ИИ-бриф?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "6 вопросов о компании, ИИ формирует отчёт с тремя главными рисками. 5 минут, обработка данных — на собственных серверах в России."
+          }
+        }
+      ]
+    }
+  ]
+}
+  </script>
 </head>
 <body>
 
