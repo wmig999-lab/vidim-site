@@ -320,7 +320,7 @@ h2 em{font-style:normal;color:var(--muted);}
       "name": "Vidim (Видим)",
       "legalName": "ООО «АйВиСистемз»",
       "url": "https://vidim.site/",
-      "email": "hello@vidim.site",
+      "email": "info@abc-xr.ru",
       "identifier": [
         {
           "@type": "PropertyValue",
@@ -899,5 +899,18 @@ function toggleAudit(){
   }
 }
 </script>
+  <!-- Vidim: цели Яндекс.Метрики (reachGoal) -->
+  <script>
+  (function(){
+    function goal(g){ try{ if(typeof ym==='function') ym(110439599,'reachGoal',g); }catch(e){} }
+    document.addEventListener('click', function(e){
+      var a = e.target.closest && e.target.closest('a[href*="brief.vidim.site"]');
+      if (a) goal('brief_start');
+    }, true);
+    document.addEventListener('submit', function(e){
+      if (e.target && e.target.id === 'diagFormEl') goal('diag_request');
+    }, true);
+  })();
+  </script>
 </body>
 </html>
