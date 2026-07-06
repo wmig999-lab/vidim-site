@@ -111,7 +111,7 @@ module.exports = async (req, res) => {
       });
       return res.status(200).json({ webhook: url, telegram: r });
     }
-    return res.status(200).send(`Vidim bot: OK | secret:${SECRET ? SECRET.length : 0} | build:v6 | env:${process.env.VERCEL_ENV||'?'} | target:${process.env.VERCEL_TARGET_ENV||'?'} | ollama:${process.env.OLLAMA_API_KEY?1:0} | owner:${process.env.OWNER_CHAT_ID?1:0}`);
+    return res.status(200).send(`Vidim bot: OK | secret:${SECRET ? SECRET.length : 0} | build:v7 | url:${process.env.VERCEL_URL||'?'} | proj:${process.env.VERCEL_PROJECT_PRODUCTION_URL||'?'} | branch:${process.env.VERCEL_GIT_COMMIT_REF||'?'}`);
   }
 
   if (req.method !== 'POST') return res.status(405).end();
