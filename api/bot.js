@@ -111,7 +111,7 @@ module.exports = async (req, res) => {
       });
       return res.status(200).json({ webhook: url, telegram: r });
     }
-    return res.status(200).send(`Vidim bot: OK | secret:${SECRET ? SECRET.length : 0} | build:v7 | url:${process.env.VERCEL_URL||'?'} | proj:${process.env.VERCEL_PROJECT_PRODUCTION_URL||'?'} | branch:${process.env.VERCEL_GIT_COMMIT_REF||'?'}`);
+    return res.status(200).send('Vidim bot: OK');
   }
 
   if (req.method !== 'POST') return res.status(405).end();
@@ -168,4 +168,3 @@ module.exports = async (req, res) => {
   return res.status(200).end();
 };
 
-// redeploy trigger: apply BOT_WEBHOOK_SECRET v2 2026-07-06
