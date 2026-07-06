@@ -168,4 +168,4 @@ module.exports = async (req, res) => {
   return res.status(200).end();
 };
 
-// redeploy trigger: force fresh env (BOT_WEBHOOK_SECRET) 2026-07-06
+// redeploy trigger: apply BOT_WEBHOOK_SECRET v2 2026-07-06
