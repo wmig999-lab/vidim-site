@@ -897,7 +897,7 @@ document.getElementById('diagFormEl').addEventListener('submit',function(e){
     source:isAudit?'audit':'tier',
     company_url:document.getElementById('dCompanyUrl').value
   };
-  fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  fetch('https://www.vidim.site/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
     .then(r=>r.json())
     .then(j=>{if(!j||!j.ok)throw new Error((j&&j.error)||'fail');document.getElementById('diagForm').style.display='none';document.getElementById('diagOk').style.display='';})
     .catch(ex=>{console.error('[diag] lead failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;});
