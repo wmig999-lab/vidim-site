@@ -832,12 +832,17 @@ onScroll();addEventListener('scroll',onScroll,{passive:true});
 
 // reveal on scroll — enhancement only; content never stays hidden
 const rvs=document.querySelectorAll('.rv');
+const revealAll=()=>rvs.forEach(el=>el.classList.add('in'));
 if('IntersectionObserver' in window){
-  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
-  rvs.forEach((el,i)=>{el.style.transitionDelay=(Math.min(i%4,3)*60)+'ms';io.observe(el);});
-  // safety net: force-reveal anything still hidden (bg tab / IO stalls)
-  addEventListener('load',()=>setTimeout(()=>document.querySelectorAll('.rv:not(.in)').forEach(el=>{const r=el.getBoundingClientRect();if(r.top<innerHeight)el.classList.add('in');}),1800));
-}else{rvs.forEach(el=>el.classList.add('in'));}
+  try{
+    // rootMargin в ПИКСЕЛЯХ (не %) — Safari/WebKit некорректно обрабатывает проценты → блоки не проявлялись
+    const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+    rvs.forEach((el,i)=>{el.style.transitionDelay=(Math.min(i%4,3)*60)+'ms';io.observe(el);});
+    // подстраховка (WebKit): проявляем при скролле независимо от IO — контент никогда не остаётся скрытым, анимация сохраняется
+    const chk=()=>document.querySelectorAll('.rv:not(.in)').forEach(el=>{if(el.getBoundingClientRect().top<innerHeight-20)el.classList.add('in');});
+    addEventListener('scroll',chk,{passive:true});setTimeout(chk,600);
+  }catch(e){revealAll();}
+}else{revealAll();}
 
 // cookie
 function acceptCookies(){localStorage.setItem('cookieAccepted','1');document.getElementById('cookie').classList.remove('show');}
