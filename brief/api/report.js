@@ -299,6 +299,120 @@ function buildInternalHtml(internal, meta, client) {
   return S.join('');
 }
 
+// Красивый брендированный HTML клиентского отчёта «Операционный код» (тело письма + вложение)
+function buildClientHtml(report, meta) {
+  const d = report || {}, m = meta || {};
+  const p = d.profile || {}, ns = d.next_step || {};
+  const arr = x => Array.isArray(x) ? x : [];
+  const sevBg = { critical: '#c0281a', high: '#b64c1b', medium: '#70747e' };
+  const sevRu = { critical: 'критично', high: 'высокий', medium: 'средний' };
+  const horRu = { quick_win: 'быстрая победа', '1_month': 'горизонт 1 месяц', '3_months': 'горизонт 3 месяца', strategic: 'стратегия' };
+  const effRu = { low: 'усилия: низкие', medium: 'усилия: средние', high: 'усилия: высокие' };
+  const sec = (title, inner) => '<div style="margin-top:28px"><div style="font:600 12px \'Spline Sans Mono\',monospace;letter-spacing:.04em;text-transform:uppercase;color:#4252cd;border-bottom:1px solid #dde0e4;padding-bottom:6px;margin-bottom:14px">' + h(title) + '</div>' + inner + '</div>';
+  const chip = t => t ? '<span style="display:inline-block;font:600 11px \'Spline Sans Mono\',monospace;color:#4252cd;background:#eceef9;border-radius:6px;padding:3px 9px;margin:0 6px 6px 0">' + h(t) + '</span>' : '';
+
+  const S = [];
+  S.push('<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">');
+  S.push('<title>Ваш операционный код — ' + h(m.industry || 'Vidim') + '</title>');
+  S.push('<link href="https://fonts.bunny.net/css?family=onest:400,500,600,700|spline-sans-mono:400,500&display=swap" rel="stylesheet">');
+  S.push('</head><body style="margin:0;background:#eceef2;font-family:Onest,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;color:#12161f;line-height:1.55">');
+  S.push('<div style="max-width:640px;margin:0 auto;background:#fbfcfe">');
+  // header
+  S.push('<div style="background:#12161f;color:#fff;padding:28px 30px">' +
+    '<div style="font:600 12px Spline Sans Mono,monospace;color:#8f96de;letter-spacing:.05em">VIDIM · ВАШ ОПЕРАЦИОННЫЙ КОД</div>' +
+    '<div style="font-weight:700;font-size:23px;letter-spacing:-.02em;margin-top:10px">' + h(m.industry || 'Первичный разбор') + '</div>' +
+    (m.size ? '<div style="color:#c3c7d6;font-size:13.5px;margin-top:6px">' + h(m.size) + '</div>' : '') + '</div>');
+  // greeting + intro
+  S.push('<div style="padding:24px 30px">');
+  S.push('<p style="font-size:15px;margin:0 0 4px">' + (m.name ? 'Здравствуйте, ' + h(m.name) + '!' : 'Здравствуйте!') + '</p>');
+  S.push('<p style="font-size:14px;color:#4d535e;margin:0">Спасибо за бриф. Ниже — первичный операционный разбор' + (m.company ? ' по компании «' + h(m.company) + '»' : '') + ', собранный по вашим ответам.</p>');
+  // profile
+  if (p.summary || p.maturity || p.growth_stage) {
+    const chips = chip(p.maturity) + chip(p.growth_stage) + chip(p.size);
+    S.push(sec('Профиль', (p.summary ? '<p style="font-size:14.5px;color:#2c313b;margin:0 0 12px">' + h(p.summary) + '</p>' : '') + (chips ? '<div>' + chips + '</div>' : '')));
+  }
+  // risks
+  const risks = arr(d.top_risks);
+  const risksHtml = risks.map(r => '<div style="border:1px solid #dde0e4;border-radius:10px;padding:15px 17px;margin-bottom:11px">' +
+    '<div style="display:flex;justify-content:space-between;gap:10px"><b style="font-size:15.5px">' + h(r.title || '') + '</b>' +
+    (r.severity ? '<span style="flex:none;font:600 11px Spline Sans Mono,monospace;color:#fff;background:' + (sevBg[r.severity] || '#70747e') + ';padding:3px 9px;border-radius:6px;height:fit-content">' + h(sevRu[r.severity] || r.severity) + '</span>' : '') + '</div>' +
+    (r.what_happens ? '<div style="font-size:13.5px;color:#4d535e;margin-top:8px">' + h(r.what_happens) + '</div>' : '') +
+    (r.impact ? '<div style="font-size:13.5px;color:#9e441d;margin-top:5px"><b>Грозит:</b> ' + h(r.impact) + '</div>' : '') +
+    (r.signal ? '<div style="font-size:12.5px;color:#70747e;margin-top:5px;font-family:Spline Sans Mono,monospace">▸ ' + h(r.signal) + '</div>' : '') +
+    '</div>').join('');
+  if (risksHtml) S.push(sec('Топ рисков (' + risks.length + ')', risksHtml));
+  // recommendations
+  const recs = arr(d.recommendations);
+  const recsHtml = recs.map(r => '<div style="margin-bottom:12px">' +
+    '<div style="font-size:14.5px;font-weight:600">' + h(r.action || '') + '</div>' +
+    (r.why ? '<div style="font-size:13.5px;color:#4d535e;margin-top:3px">' + h(r.why) + '</div>' : '') +
+    '<div style="margin-top:5px">' + chip(horRu[r.horizon] || r.horizon) + chip(effRu[r.effort]) + '</div>' +
+    '</div>').join('');
+  if (recsHtml) S.push(sec('Что делать', recsHtml));
+  // hypothesis
+  if (d.diagnostic_hypothesis) S.push(sec('Наша гипотеза', '<div style="font-size:14px;color:#2c313b;background:#f2f3f7;border-left:3px solid #4252cd;border-radius:0 8px 8px 0;padding:13px 16px">' + h(d.diagnostic_hypothesis) + '</div>'));
+  // CTA (мягкий)
+  const guar = arr(ns.guarantees);
+  S.push('<div style="margin-top:30px;background:#eceef9;border:1px solid #d5d9f2;border-radius:12px;padding:20px 22px">' +
+    '<div style="font:600 12px Spline Sans Mono,monospace;color:#4252cd;letter-spacing:.04em;text-transform:uppercase">Следующий шаг</div>' +
+    '<div style="font-weight:700;font-size:18px;margin-top:8px">' + h(ns.product || 'Экспресс-диагностика') + (ns.price ? ' — ' + h(ns.price) : '') + '</div>' +
+    (ns.why ? '<p style="font-size:14px;color:#4d535e;margin:8px 0 0">' + h(ns.why) + '</p>' : '') +
+    (ns.what_will_get ? '<p style="font-size:13.5px;color:#2c313b;margin:8px 0 0"><b>Что получите:</b> ' + h(ns.what_will_get) + '</p>' : '') +
+    (guar.length ? '<div style="margin-top:10px">' + guar.map(g => '<div style="font-size:13px;color:#2c313b;margin-top:3px">✓ ' + h(g) + '</div>').join('') + '</div>' : '') +
+    '<a href="https://vidim.site" style="display:inline-block;margin-top:16px;background:#4252cd;color:#fff;text-decoration:none;font-weight:600;font-size:14.5px;padding:12px 24px;border-radius:9px">Записаться на диагностику →</a>' +
+    (ns.duration ? '<div style="font-size:12.5px;color:#70747e;margin-top:10px">Срок: ' + h(ns.duration) + '</div>' : '') + '</div>');
+
+  S.push('</div>'); // padding
+  S.push('<div style="padding:18px 30px;border-top:1px solid #dde0e4;color:#70747e;font-size:11.5px">Vidim · ООО «АйВиСистемз» · <a href="mailto:info@abc-xr.ru" style="color:#4252cd">info@abc-xr.ru</a> · vidim.site<br>Отчёт подготовлен автоматически по вашим ответам на бриф. Данные обрабатываются в соответствии с 152-ФЗ.</div>');
+  S.push('</div></body></html>');
+  return S.join('');
+}
+
+// Краткая текстовая версия клиентского отчёта (fallback для текстовых почтовых клиентов)
+function clientToText(report, meta) {
+  const d = report || {}, m = meta || {}, p = d.profile || {}, ns = d.next_step || {};
+  const arr = x => Array.isArray(x) ? x : [];
+  let t = 'ВАШ ОПЕРАЦИОННЫЙ КОД' + (m.industry ? ' — ' + m.industry : '') + '\n\n';
+  t += (m.name ? 'Здравствуйте, ' + m.name + '!\n' : 'Здравствуйте!\n');
+  t += 'Первичный операционный разбор по вашим ответам на бриф.\n\n';
+  if (p.summary) t += 'ПРОФИЛЬ\n' + p.summary + '\n\n';
+  const risks = arr(d.top_risks);
+  if (risks.length) { t += 'ТОП РИСКОВ\n'; risks.forEach((r, i) => { t += (i + 1) + '. [' + (r.severity || '') + '] ' + (r.title || '') + '\n   ' + (r.what_happens || '') + '\n   Грозит: ' + (r.impact || '') + '\n'; }); t += '\n'; }
+  const recs = arr(d.recommendations);
+  if (recs.length) { t += 'ЧТО ДЕЛАТЬ\n'; recs.forEach((r, i) => { t += (i + 1) + '. (' + (r.horizon || '') + ') ' + (r.action || '') + ' — ' + (r.why || '') + '\n'; }); t += '\n'; }
+  if (d.diagnostic_hypothesis) t += 'ГИПОТЕЗА\n' + d.diagnostic_hypothesis + '\n\n';
+  t += 'СЛЕДУЮЩИЙ ШАГ: ' + (ns.product || 'Экспресс-диагностика') + (ns.price ? ' — ' + ns.price : '') + '\n';
+  if (ns.what_will_get) t += ns.what_will_get + '\n';
+  t += 'Записаться: https://vidim.site\n\nVidim · info@abc-xr.ru';
+  return t;
+}
+
+// Отправка клиентского отчёта клиенту через SMTP (Яндекс) + вложение operational-code.html
+async function sendClientEmail(report, meta) {
+  const user = process.env.SMTP_USER, pass = process.env.SMTP_PASS;
+  if (!user || !pass) { console.warn('[vidim/api] SMTP_USER/SMTP_PASS not set — client email skipped'); return false; }
+  const m = meta || {};
+  if (!m.email) { console.warn('[vidim/api] client email missing — client email skipped'); return false; }
+  try {
+    const html = buildClientHtml(report, meta);
+    const text = clientToText(report, meta);
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.yandex.ru', port: 465, secure: true,
+      auth: { user, pass },
+      connectionTimeout: 9000, greetingTimeout: 9000, socketTimeout: 12000
+    });
+    // Тема БЕЗ «бриф Видим» — чтобы письмо клиенту не попало во внутреннюю папку Vidim.
+    const subject = 'Ваш операционный код' + (m.industry ? ' — ' + m.industry : '');
+    await transporter.sendMail({
+      from: '"Vidim" <' + user + '>', to: m.email, subject,
+      text, html,
+      attachments: [{ filename: 'operational-code.html', content: html, contentType: 'text/html; charset=utf-8' }]
+    });
+    console.log('[vidim/api] client report sent via SMTP → ' + m.email);
+    return true;
+  } catch (e) { console.error('[vidim/api] SMTP client email failed', e.message); return false; }
+}
+
 // Отправка внутреннего отчёта команде через SMTP (Яндекс) + вложение internal-report.html
 async function sendInternalEmail(internal, meta, client) {
   const user = process.env.SMTP_USER, pass = process.env.SMTP_PASS;
@@ -376,12 +490,18 @@ async function handler(req, res) {
     if (!data.profile || !Array.isArray(data.top_risks) || !data.next_step) throw new Error('invalid structure');
     console.log('[vidim/api] v4.1 (api/report) ollama OK:', data.profile?.industry, '/', data.profile?.maturity, '/ model', MODEL);
     const internal = stripInternal(data);
-    const teamNotified = await sendInternalEmail(internal, {
+    const meta = {
       industry: data.profile && data.profile.industry, size: data.profile && data.profile.size,
       name: body.name, email: body.email, phone: body.phone, company: body.company,
       apiModel: MODEL
-    }, data);
-    return res.status(200).json({ data, source: 'ollama', teamNotified });
+    };
+    // Оба письма параллельно (Promise.all): генерация ~50-58с при maxDuration 60 —
+    // два SMTP последовательно рискуют таймаутом. Параллельно = ~1 SMTP-раунд.
+    const [teamNotified, clientNotified] = await Promise.all([
+      sendInternalEmail(internal, meta, data),
+      sendClientEmail(data, meta)
+    ]);
+    return res.status(200).json({ data, source: 'ollama', teamNotified, clientNotified });
   } catch(err) {
     console.error('[vidim/api] error:', err.message);
     return res.status(500).json({ error: err.message, fallback: true });
@@ -393,5 +513,8 @@ module.exports.internalToText = internalToText;
 module.exports.stripInternal = stripInternal;
 module.exports.sendInternalEmail = sendInternalEmail;
 module.exports.buildInternalHtml = buildInternalHtml;
+module.exports.buildClientHtml = buildClientHtml;
+module.exports.clientToText = clientToText;
+module.exports.sendClientEmail = sendClientEmail;
 // Vercel: даём функции время на генерацию (на Pro до 300с; на Hobby клампится к лимиту плана).
 module.exports.config = { maxDuration: 60 };
