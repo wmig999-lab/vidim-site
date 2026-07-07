@@ -191,7 +191,75 @@ input::placeholder,textarea::placeholder{color:var(--muted);}
 .dm-ok .dm-ok-ic{width:52px;height:52px;border-radius:50%;background:var(--accent-t);color:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
 .dm-ok h3{margin-bottom:8px;}
 .dm-ok p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+
+/* ── премиальный отчёт: оформление + PDF/печать ── */
+.rep-masthead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:14px;margin-bottom:30px;border-bottom:2px solid var(--ink);}
+.rm-left{display:flex;flex-direction:column;gap:5px;}
+.rm-brand{font-weight:800;font-size:21px;letter-spacing:-.02em;color:var(--ink);display:inline-flex;align-items:center;gap:5px;}
+.rm-brand i{width:7px;height:7px;border-radius:50%;background:var(--signal);}
+.rm-title{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);}
+.rm-right{display:flex;flex-direction:column;align-items:flex-end;gap:9px;}
+.rm-date{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right;}
+.pdf-btn{display:inline-flex;align-items:center;gap:7px;background:var(--surface);color:var(--ink);border:1px solid var(--line);padding:9px 15px;border-radius:var(--r-s);font-family:var(--sans);font-weight:600;font-size:13px;cursor:pointer;transition:.2s var(--e);}
+.pdf-btn:hover{background:var(--accent-t);border-color:var(--accent);color:var(--accent-d);}
+.risk-n{color:var(--muted);font-weight:600;}
+.sev-badge{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:4px 9px;border-radius:999px;margin-left:auto;flex-shrink:0;white-space:nowrap;align-self:flex-start;}
+.sev-badge.sev-critical{background:color-mix(in srgb,var(--signal) 13%,#fff);color:var(--signal-t);}
+.sev-badge.sev-high{background:var(--accent-t);color:var(--accent-d);}
+.sev-badge.sev-medium{background:var(--surface-2);color:var(--ink-2);}
+.rec-eff{display:inline-block;margin-top:7px;font-family:var(--mono);font-size:10.5px;color:var(--muted);}
+.rep-foot .rf-brand{font-weight:700;color:var(--ink);}
+.rep-foot .rf-conf{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted);}
+.rep-print-foot{display:none;}
+@media print{
+  @page{size:A4;margin:15mm 14mm 17mm;}
+  html,body{background:#fff !important;}
+  *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+  body{visibility:hidden !important;}
+  #app,#app *{visibility:visible !important;}
+  #app{position:absolute;left:0;top:0;width:100%;margin:0 !important;padding:0 !important;max-width:none !important;}
+  .report{animation:none !important;}
+  .pdf-btn,.ns-btn,#reqDiag{display:none !important;}
+  .risk,.rec,.next,.hypo{break-inside:avoid;page-break-inside:avoid;}
+  .next{background:var(--ink) !important;color:#fff !important;border-radius:10px;}
+  .rep-print-foot{display:block !important;position:fixed;bottom:5mm;left:0;right:0;text-align:center;font-family:var(--mono);font-size:9px;color:var(--muted);}
+}
 </style>
+  <!-- Yandex.Metrika counter -->
+  <script type="text/javascript">
+      (function(m,e,t,r,i,k,a){
+          m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+          m[i].l=1*new Date();
+          for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+          k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+      })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=110439599', 'ym');
+
+      ym(110439599, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/110439599" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+  <!-- /Yandex.Metrika counter -->
+  <!-- Vidim: цели Яндекс.Метрики для брифа (reachGoal) -->
+  <script>
+  (function(){
+    function goal(g){ try{ if(typeof ym==='function') ym(110439599,'reachGoal',g); }catch(e){} }
+    var startFired=false, doneFired=false;
+    document.addEventListener('click', function(e){
+      var b = e.target.closest && e.target.closest('button');
+      if (b && !startFired && /Далее/.test(b.textContent||'')) { startFired=true; goal('brief_start'); }
+    }, true);
+    var of = window.fetch;
+    if (of) window.fetch = function(){
+      var url = (arguments[0] && arguments[0].url) || arguments[0] || '';
+      var p = of.apply(this, arguments);
+      try {
+        if (typeof url==='string' && /\/api\/(report|generate-report)/.test(url)) {
+          p.then(function(r){ if(r && r.ok && !doneFired){ doneFired=true; goal('brief_done'); } }).catch(function(){});
+        }
+      } catch(e){}
+      return p;
+    };
+  })();
+  </script>
 </head>
 <body>
 
@@ -483,30 +551,47 @@ function renderReport(d) {
     profile.growth_stage && ['Стадия', profile.growth_stage]
   ].filter(Boolean).map(([k, v]) => `<span class="pill">${esc(k)}: <b>${esc(v)}</b></span>`).join('');
 
-  const risks = (d.top_risks || []).map(r => `
+  const risks = (d.top_risks || []).map((r, ix) => `
     <div class="risk">
       <div class="risk-h">
         <span class="risk-sev ${esc(r.severity || 'high')}"></span>
-        <h3>${esc(r.title || '')}</h3>
-        <span class="sevlbl">${esc(sevLabel[r.severity] || r.severity || '')}</span>
+        <h3><span class="risk-n">${ix + 1}.</span> ${esc(r.title || '')}</h3>
+        <span class="sev-badge sev-${esc(r.severity || 'high')}">${esc(sevLabel[r.severity] || r.severity || '')}</span>
       </div>
       ${r.what_happens ? `<p>${esc(r.what_happens)}</p>` : ''}
       ${r.impact ? `<p class="impact"><span class="lab">Чем грозит:</span> ${esc(r.impact)}</p>` : ''}
       ${r.signal ? `<p><span class="lab">Сигнал в данных:</span> ${esc(r.signal)}</p>` : ''}
     </div>`).join('');
 
+  const effLabel = { low: 'низкие усилия', medium: 'средние усилия', high: 'высокие усилия' };
   const recs = (d.recommendations || []).map(r => `
     <div class="rec">
       <span class="horizon">${esc(horLabel[r.horizon] || r.horizon || '')}</span>
-      <div><h4>${esc(r.action || '')}</h4>${r.why ? `<p>${esc(r.why)}</p>` : ''}</div>
+      <div><h4>${esc(r.action || '')}</h4>${r.why ? `<p>${esc(r.why)}</p>` : ''}${r.effort ? `<span class="rec-eff">${esc(effLabel[r.effort] || r.effort)}</span>` : ''}</div>
     </div>`).join('');
 
   const ns = d.next_step || {};
   const guarantees = (ns.guarantees || []).map(g => `<span class="g">✓ ${esc(g)}</span>`).join('');
 
+  const dateStr = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+
   app.innerHTML = `<div class="report">
+    <header class="rep-masthead">
+      <div class="rm-left">
+        <span class="rm-brand">Vidim<i></i></span>
+        <span class="rm-title">Первичный операционный отчёт</span>
+      </div>
+      <div class="rm-right">
+        <button type="button" class="pdf-btn" onclick="window.print()">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Скачать PDF
+        </button>
+        <span class="rm-date">${esc(a.company || '')} · ${dateStr}</span>
+      </div>
+    </header>
+
     <div class="rep-top">
-      <span class="tag mono">Ваш операционный код · ${esc(a.company || '')}</span>
+      <span class="tag mono">Ваш операционный код</span>
       <h1>Первичная диагностика готова</h1>
       ${profile.summary ? `<p class="rep-summary">${esc(profile.summary)}</p>` : ''}
       ${pills ? `<div class="profile">${pills}</div>` : ''}
@@ -528,8 +613,12 @@ function renderReport(d) {
       </button>
     </div>
 
-    <p class="rep-foot">Копия отчёта отправлена на <b>${esc(a.email || '')}</b>.<br>
-    Это первичная ИИ-оценка по вашим ответам — не заменяет полную диагностику. Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a></p>
+    <footer class="rep-foot">
+      <span class="rf-brand">Vidim</span> · Первичная ИИ-оценка по вашим ответам — не заменяет полную диагностику.<br>
+      Копия отправлена на <b>${esc(a.email || '')}</b> · Вопросы: <a href="mailto:info@abc-xr.ru">info@abc-xr.ru</a> · <a href="https://t.me/vidim_consult">@vidim_consult</a><br>
+      <span class="rf-conf">Конфиденциально · подготовлено ${dateStr}</span>
+    </footer>
+    <div class="rep-print-foot">Vidim · Первичный операционный отчёт · info@abc-xr.ru · Конфиденциально</в></div>
   </div>`;
   app.querySelector('#reqDiag')?.addEventListener('click', () => openDiagModal(ns));
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -769,13 +858,11 @@ function sendEmails(report, apiOk, teamNotified, clientNotified) {
     api_status: apiOk ? 'OK (ИИ-отчёт сформирован)' : 'FALLBACK (нужен ручной разбор)'
   };
 
-  // apiOk: команду уже уведомил сервер (внутренний отчёт). Клиенту сервер шлёт
-  // красивый HTML-отчёт по SMTP (clientNotified). EmailJS клиенту — только fallback,
-  // если серверное письмо не ушло (нет SMTP / нет email / ошибка) — чтобы не было дубля.
+  // apiOk: команду уже уведомил сервер (внутренний отчёт). Клиенту шлём его отчёт.
   // fallback: сервер не сгенерил — шлём короткое уведомление команде, чтобы лид не потерялся.
   if (apiOk) {
     if (a.email && !clientNotified) emailjs.send(EMAILJS.service, EMAILJS.tplReport, common)
-      .catch(e => console.error('[brief] report email fallback failed', e));
+      .catch(e => console.error('[brief] report email failed', e));
     if (!teamNotified) emailjs.send(EMAILJS.service, EMAILJS.tplNotify, common)
       .catch(e => console.error('[brief] team fallback notify failed', e));
   } else {
