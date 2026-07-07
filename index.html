@@ -824,7 +824,6 @@ h2 em{font-style:normal;color:var(--muted);}
   <button onclick="acceptCookies()">Хорошо</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 // header shadow on scroll
 const hd=document.getElementById('hd');
@@ -844,9 +843,7 @@ if('IntersectionObserver' in window){
 function acceptCookies(){localStorage.setItem('cookieAccepted','1');document.getElementById('cookie').classList.remove('show');}
 if(!localStorage.getItem('cookieAccepted')){setTimeout(()=>document.getElementById('cookie').classList.add('show'),1200);}
 
-/* ---------- Заявка на диагностику (EmailJS → info@abc-xr.ru) ---------- */
-const DIAG_EMAILJS={publicKey:'Xvg10AeigkaR_anxB',service:'service_c8kqi5s',tpl:'template_jakea23'};
-if(window.emailjs)emailjs.init({publicKey:DIAG_EMAILJS.publicKey});
+/* ---------- Заявка на диагностику (серверный Яндекс-SMTP → info@abc-xr.ru) ---------- */
 const diagEl=document.getElementById('diag');
 let diagSource='';
 const DIAG_CTX={
@@ -890,40 +887,20 @@ document.getElementById('diagFormEl').addEventListener('submit',function(e){
   const btnLabel=(DIAG_CTX[diagSource]||DIAG_CTX.tier).submit;
   btn.disabled=true;btn.textContent='Отправляем…';
 
-  const pad=n=>(n<10?'0':'')+n,now=new Date();
-  const sentAt=`${pad(now.getDate())}.${pad(now.getMonth()+1)}.${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   const cval=contact.value.trim();
-  const isEmail=/@/.test(cval);
-  // Метки письма по источнику: заявка на диагностику vs заказ звонка по аудиту.
   const isAudit=diagSource==='audit';
-  const flag=isAudit?'📞 ЗАКАЗ ЗВОНКА — АУДИТ':'🔥 ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)';
-  const industryLine=isAudit?'📞 Заказ бесплатного звонка-разбора по аудиту (от 600k)':'🔥 Прямая заявка на диагностику — клиент готов начать без брифа';
-  const painsLine=isAudit?'Запрос звонка-консультации по аудиту. Перезвонить клиенту.':'Готов начать Экспресс-диагностику сразу, минуя бриф. Связаться с клиентом.';
-  const kind=isAudit?'ЗАКАЗ ЗВОНКА ПО АУДИТУ':'ПРЯМАЯ ЗАЯВКА НА ДИАГНОСТИКУ (без брифа)';
-  // Шаблон template_jakea23 свёрстан под бриф и рендерит фиксированный набор переменных
-  // (name, company, industry, size, role, client_email, pains, expectations, budget, risks…).
-  // Кладём заявку ТОЛЬКО в эти поля, чтобы ничего не потерялось. Контакт всегда в client_email
-  // (в шаблоне нет client_phone). Тема содержит «бриф Видим» → правило кладёт письмо в папку Vidim.
-  const contactLine=cval+(isEmail?'':' (телефон)');
-  const params={
-    name:name.value.trim(), client_name:name.value.trim(),
-    company:company.value.trim(), company_name:company.value.trim(),
-    client_email:contactLine, client_phone:isEmail?'':cval,
-    company_industry:flag, company_size:company.value.trim(),
-    industry:industryLine,
-    size:'—', role:'—', company_role:'—',
-    pains:painsLine, budget:'—',
-    expectations:comment?`Комментарий клиента: ${comment}`:'Без комментария',
-    brief_answers:`${kind}\nИсточник: ${diagSource||'landing'}\nИмя: ${name.value.trim()}\nКомпания: ${company.value.trim()}\nКонтакт: ${cval}\nКомментарий: ${comment||'—'}`,
-    risks_list:'—', top_risks:'—', risk_1:'—', risk_2:'—', risk_3:'—',
-    sent_at:sentAt, date:sentAt, session_id:(isAudit?'audit-':'diag-')+now.getTime(),
-    api_status:isAudit?'ЗАКАЗ ЗВОНКА — перезвонить клиенту':'ПРЯМАЯ ЗАЯВКА — связаться с клиентом'
+  const payload={
+    name:name.value.trim(),
+    company:company.value.trim(),
+    contact:cval,
+    comment:comment,
+    source:isAudit?'audit':'tier',
+    company_url:document.getElementById('dCompanyUrl').value
   };
-
-  if(!window.emailjs){err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;return;}
-  emailjs.send(DIAG_EMAILJS.service,DIAG_EMAILJS.tpl,params)
-    .then(()=>{document.getElementById('diagForm').style.display='none';document.getElementById('diagOk').style.display='';})
-    .catch(ex=>{console.error('[diag] email failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;});
+  fetch('/api/lead',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+    .then(r=>r.json())
+    .then(j=>{if(!j||!j.ok)throw new Error((j&&j.error)||'fail');document.getElementById('diagForm').style.display='none';document.getElementById('diagOk').style.display='';})
+    .catch(ex=>{console.error('[diag] lead failed',ex);err.classList.add('show');btn.disabled=false;btn.textContent=btnLabel;});
 });
 
 /* ---------- Разворот аудита ---------- */
