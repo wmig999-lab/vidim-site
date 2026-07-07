@@ -34,8 +34,10 @@ module.exports = async (req, res) => {
 
   if (!name || !company || !contact) return res.status(400).json({ error: 'name, company, contact required' });
 
-  const user = process.env.SMTP_USER, pass = process.env.SMTP_PASS;
-  if (!user || !pass) { console.error('[lead] SMTP_USER/SMTP_PASS not set'); return res.status(503).json({ error: 'mail not configured', fallback: true }); }
+  // принимаем оба варианта имён env (как в проекте брифа SMTP_*, и добавленные EMAIL_USER/YANDEX_PASSWORD)
+  const user = process.env.SMTP_USER || process.env.EMAIL_USER;
+  const pass = process.env.SMTP_PASS || process.env.YANDEX_PASSWORD;
+  if (!user || !pass) { console.error('[lead] SMTP creds not set (SMTP_USER/SMTP_PASS or EMAIL_USER/YANDEX_PASSWORD)'); return res.status(503).json({ error: 'mail not configured', fallback: true }); }
 
   const map = {
     audit: { kind: 'ЗАКАЗ ЗВОНКА — АУДИТ', emoji: '📞' },
